@@ -1,0 +1,95 @@
+name: Perform deployment to production
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  # Perform the deployment to Prod
+  build:
+    # Need to make sure that when the PR was closed, it was actually merged.
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+
+    name: Deployment Script
+    runs-on: ubuntu-latest
+
+    # Set environment variables in
+    # https://github.com//<your org>/<your repo>/settings/variables/actions
+    #
+    # Alternatively, You can define multiple ENV for different workflows.
+    # https://github.com/<org>/<repo>/settings/environments
+    # environment: PR_ENV
+    container: datacoves/ci-basic-dbt-snowflake:2.3
+
+    defaults:
+      run:
+        # If your dbt project is at the root.
+        working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }} 
+
+        # # If your dbt project is inside a transform directory.
+        # working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform 
+
+    env:
+      DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/automate/dbt
+      # If your dbt project is at the root.
+      DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }} 
+      # # If your dbt project is inside a transform directory.
+    #   DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform 
+
+      ##### Snowflake #####
+      DATACOVES__MAIN__ACCOUNT:   ${{ vars.DATACOVES__MAIN__ACCOUNT }}
+
+      DATACOVES__MAIN__DATABASE:  ${{ vars.DATACOVES__MAIN__DATABASE }}
+      DATACOVES__MAIN__SCHEMA:    ${{ vars.DATACOVES__MAIN__SCHEMA }}
+
+      DATACOVES__MAIN__ROLE:      ${{ vars.DATACOVES__MAIN__ROLE }}
+      DATACOVES__MAIN__WAREHOUSE: ${{ vars.DATACOVES__MAIN__WAREHOUSE }}
+
+      DATACOVES__MAIN__USER:      ${{ vars.DATACOVES__MAIN__USER }}
+      DATACOVES__MAIN__PASSWORD:  ${{ secrets.DATACOVES__MAIN__PASSWORD }}
+
+      ##### Redshift #####
+      # DATACOVES__MAIN__HOST: "{{ env_var('DATACOVES__MAIN__HOST') }}"
+      # DATACOVES__MAIN__USER: "{{ env_var('DATACOVES__MAIN__USER') }}"
+      # DATACOVES__MAIN__PASSWORD: "{{ env_var('DATACOVES__MAIN__PASSWORD') }}"
+      # DATACOVES__MAIN__DATABASE: "{{ env_var('DATACOVES__MAIN__DATABASE') }}"
+      # DATACOVES__MAIN__SCHEMA: "{{ env_var('DATACOVES__MAIN__SCHEMA') }}"
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.push.head.sha }}
+          fetch-depth: 0
+
+      - name: Set Secure Directory
+        run: git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
+
+      - name: Install dbt packages
+        run: "dbt deps"
+
+      - name: dbt build
+        run: "dbt build"
+
+      - name: Generate dbt documentation
+        run: "dbt docs generate"
+
+      - name: Deploy docs 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: dbt-docs
+          folder: /target
+
+      - name: Push version changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+          tags: true
