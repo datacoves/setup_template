@@ -22,7 +22,7 @@ build_and_test:
   stage: build
   script:
     - git fetch origin main
-    - git diff origin/main HEAD -- name-status 
+    - git diff origin/main HEAD --name-status 
     - dbt deps
     - dbt build --fail-fast
   only:
@@ -31,11 +31,10 @@ build_and_test:
 pre_commit:
   stage: build
   script:
-    - CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...HEAD)
+    - CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME HEAD)
     - pre-commit run --files $CHANGED_FILES --config .pre-commit-config.yaml
   only:
     - merge_requests
-
 
 generate_and_deploy_docs:
   stage: deploy
