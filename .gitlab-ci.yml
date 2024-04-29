@@ -32,7 +32,11 @@ build_and_test:
 
 generate_and_deploy_docs:
   stage: deploy
+  before_script:
+  - git config user.email $GITLAB_USER_EMAIL
+  - git config user.name GITLAB_USER_NAME
   image: datacoves/ci-basic-dbt-snowflake:2
+  
   script:
     - dbt deps
     - dbt docs generate
@@ -40,6 +44,7 @@ generate_and_deploy_docs:
     - cp -r target/* .
     - git add .
     - git commit -m "Update dbt documentation"
+
     - git push https://oauth2:$GITLAB_TOKEN@$CI_PROJECT_URL dbt-docs
     - git push origin dbt-docs
   only:
