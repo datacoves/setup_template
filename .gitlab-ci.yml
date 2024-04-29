@@ -1,0 +1,53 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DBT_PROFILES_DIR: $CI_PROJECT_DIR/automate/dbt
+  DATACOVES__DBT_HOME: $CI_PROJECT_DIR
+  DATACOVES__MAIN__ACCOUNT: $DATACOVES_MAIN_ACCOUNT
+  DATACOVES__MAIN__DATABASE: $DATACOVES_MAIN_DATABASE
+  DATACOVES__MAIN__SCHEMA: $DATACOVES_MAIN_SCHEMA
+  DATACOVES__MAIN__ROLE: $DATACOVES_MAIN_ROLE
+  DATACOVES__MAIN__WAREHOUSE: $DATACOVES_MAIN_WAREHOUSE
+  DATACOVES__MAIN__USER: $DATACOVES_MAIN_USER
+  DATACOVES__MAIN__PASSWORD: $DATACOVES_MAIN_PASSWORD
+
+default:
+  image: datacoves/ci-basic-dbt-snowflake:2
+  before_script:
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+
+build_and_test:
+  stage: build
+  script:
+    - git fetch origin main
+    - git diff origin/main HEAD --name-status 
+    - dbt deps
+    - dbt build --fail-fast
+  only:
+    - merge_requests
+
+pre_commit:
+  stage: build
+  script:
+    - git fetch origin main
+    - CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME HEAD)
+    - pre-commit run --files $CHANGED_FILES --config .pre-commit-config.yaml
+  only:
+    - merge_requests
+
+generate_and_deploy_docs:
+  stage: deploy
+  image: datacoves/ci-basic-dbt-snowflake:2
+  script:
+    - dbt deps
+    - dbt docs generate
+    - git checkout dbt-docs || git checkout -b dbt-docs
+    - cp -r target/* .
+    - git add .
+    - git commit -m "Update dbt documentation"
+    - git push origin dbt-docs
+  only:
+    - main
+
