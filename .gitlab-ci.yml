@@ -46,7 +46,7 @@ generate_and_deploy_docs:
     - cp -r target/* .
     - git add .
     - git commit -m "Update dbt documentation"
-    - git push https://oauth2:$GITLAB_TOKEN@project_url dbt-docs
+    - git push https://oauth2:$GITLAB_TOKEN@$project_url dbt-docs
     - git push origin dbt-docs
   only:
     - main
