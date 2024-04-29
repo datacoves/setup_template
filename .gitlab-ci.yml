@@ -41,9 +41,8 @@ generate_and_deploy_docs:
   
   script:
     - dbt deps
-    - dbt docs generate
     - git checkout dbt-docs || git checkout --orphan dbt-docs
-    - cp -r target/* . # Copy new files
+    - dbt docs generate
     - git add .
     - git commit -m "Update dbt documentation"
     - git push https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs
