@@ -44,9 +44,7 @@ generate_and_deploy_docs:
     - git checkout dbt-docs || git checkout --orphan dbt-docs
     - dbt docs generate
     - cd target  
-    - cp *.json *.html graph.gpickle .. 
     - cd .. 
-    - git add .
     - git add .
     - git commit -m "Update dbt documentation"
     - git push https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs
