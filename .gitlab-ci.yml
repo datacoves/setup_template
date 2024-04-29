@@ -21,7 +21,8 @@ default:
 build_and_test:
   stage: build
   script:
-    - git diff origin/main HEAD --name-status 
+    - git fetch origin main
+    - git diff origin/main HEAD -- name-status 
     - dbt deps
     - dbt build --fail-fast
     - pre-commit run --all-files --config pre-commit-config.yml
@@ -33,6 +34,7 @@ generate_and_deploy_docs:
   stage: deploy
   image: datacoves/ci-basic-dbt-snowflake:2
   script:
+    - dbt deps
     - dbt docs generate
     - git checkout dbt-docs || git checkout -b dbt-docs
     - cp -r target/* .
