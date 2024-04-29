@@ -4,6 +4,7 @@ stages:
 
 variables:
   DBT_PROFILES_DIR: $CI_PROJECT_DIR/automate/dbt
+  # DATACOVES__DBT_HOME: $CI_PROJECT_DIR/transform
   DATACOVES__DBT_HOME: $CI_PROJECT_DIR
   DATACOVES__MAIN__ACCOUNT: $DATACOVES_MAIN_ACCOUNT
   DATACOVES__MAIN__DATABASE: $DATACOVES_MAIN_DATABASE
@@ -17,14 +18,17 @@ default:
   image: datacoves/ci-basic-dbt-snowflake:2
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
+    - cd $$CI_PROJECT_DIR
 
 build_and_test:
   stage: build
   script:
     - git fetch origin main
     - git diff origin/main HEAD --name-status 
+    - cd $DATACOVES__DBT_HOME
     - dbt deps
     - dbt build --fail-fast
+    - cd $CI_PROJECT_DIR
     - CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME HEAD)
     - pre-commit run --files $CHANGED_FILES --config .pre-commit-config.yaml
   only:
@@ -40,13 +44,20 @@ generate_and_deploy_docs:
   image: datacoves/ci-basic-dbt-snowflake:2
   
   script:
+    - git update-ref -d refs/heads/dbt-docs
+    - git switch --orphan dbt-docs
+    - cd $DATACOVES__DBT_HOME
     - dbt deps
-    - git checkout dbt-docs || git checkout --orphan dbt-docs
+    - dbt build
     - dbt docs generate
-    - cp -r target/* .
-    - git add .
+    - cp -r target/* $CI_PROJECT_DIR
+    - cd $CI_PROJECT_DIR
+    - git add catalog.json
+    - git add graph.gpickle
+      git add index.html
+    - git add manifest.json
+    - git add run_results.json
     - git commit -m "Update dbt documentation"
-    - git pull origin dbt-docs --allow-unrelated-histories 
     - git push https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs
   only:
     - main
