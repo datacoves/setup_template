@@ -31,6 +31,7 @@ build_and_test:
 pre_commit:
   stage: build
   script:
+    - git fetch origin main
     - CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME HEAD)
     - pre-commit run --files $CHANGED_FILES --config .pre-commit-config.yaml
   only:
