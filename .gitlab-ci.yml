@@ -18,7 +18,7 @@ default:
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
 
-build and test:
+build_and_test:
   stage: build
   script:
     - git fetch origin main
@@ -40,7 +40,7 @@ generate_and_deploy_docs:
     - cp -r target/* .
     - git add .
     - git commit -m "Update dbt documentation"
-    - git push https://oauth2:$CI_JOB_TOKEN@gitlab.com/datacoves/datacoves_starter_project.git dbt-docs
+    - git push https://oauth2:$GITLAB_TOKEN@$CI_PROJECT_URL dbt-docs
     - git push origin dbt-docs
   only:
     - main
