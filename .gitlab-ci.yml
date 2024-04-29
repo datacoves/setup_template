@@ -46,7 +46,7 @@ generate_and_deploy_docs:
     - cp -r target/* .
     - git add .
     - git commit -m "Update dbt documentation"
-    - git pull origin dbt-docs 
+    - git pull origin dbt-docs --allow-unrelated-histories 
     - git push https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs
   only:
     - main
