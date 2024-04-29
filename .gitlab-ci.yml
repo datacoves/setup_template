@@ -43,6 +43,7 @@ generate_and_deploy_docs:
     - dbt deps
     - git checkout dbt-docs || git checkout --orphan dbt-docs
     - dbt docs generate
+    - cd target  
     - cp *.json *.html graph.gpickle .. 
     - cd .. 
     - git add .
