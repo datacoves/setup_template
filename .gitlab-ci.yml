@@ -36,7 +36,7 @@ generate_and_deploy_docs:
   - git config user.email $GITLAB_USER_EMAIL
   - git config user.name GITLAB_USER_NAME
   - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
-
+  - git config pull.rebase false  
   image: datacoves/ci-basic-dbt-snowflake:2
   
   script:
