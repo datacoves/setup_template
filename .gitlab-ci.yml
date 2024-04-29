@@ -35,6 +35,8 @@ generate_and_deploy_docs:
   before_script:
   - git config user.email $GITLAB_USER_EMAIL
   - git config user.name GITLAB_USER_NAME
+  - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
+
   image: datacoves/ci-basic-dbt-snowflake:2
   
   script:
@@ -44,8 +46,7 @@ generate_and_deploy_docs:
     - cp -r target/* .
     - git add .
     - git commit -m "Update dbt documentation"
-
-    - git push https://oauth2:$GITLAB_TOKEN@$CI_PROJECT_URL dbt-docs
+    - git push https://oauth2:$GITLAB_TOKEN@project_url dbt-docs
     - git push origin dbt-docs
   only:
     - main
