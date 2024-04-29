@@ -18,20 +18,13 @@ default:
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
 
-build_and_test:
+build and test:
   stage: build
   script:
     - git fetch origin main
     - git diff origin/main HEAD --name-status 
     - dbt deps
     - dbt build --fail-fast
-  only:
-    - merge_requests
-
-pre_commit:
-  stage: build
-  script:
-    - git fetch origin main
     - CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME HEAD)
     - pre-commit run --files $CHANGED_FILES --config .pre-commit-config.yaml
   only:
@@ -41,15 +34,13 @@ generate_and_deploy_docs:
   stage: deploy
   image: datacoves/ci-basic-dbt-snowflake:2
   script:
-    - git config user.email "mayra@datacoves.com"
-    - git config user.name "mayra"
     - dbt deps
     - dbt docs generate
     - git checkout dbt-docs || git checkout -b dbt-docs
     - cp -r target/* .
     - git add .
     - git commit -m "Update dbt documentation"
+    - git push https://oauth2:$CI_JOB_TOKEN@gitlab.com/datacoves/datacoves_starter_project.git dbt-docs
     - git push origin dbt-docs
   only:
     - main
-
