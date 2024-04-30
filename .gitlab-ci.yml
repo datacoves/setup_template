@@ -20,8 +20,8 @@ build_and_test:
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
     - cd $$CI_PROJECT_DIR
-    - export DATACOVES__MAIN_DATABASE=$DATACOVES__TEST_DATABASE
-    - echo $DATACOVES__MAIN_DATABASE
+    - export DATACOVES__MAIN__DATABASE=$DATACOVES__TEST_DATABASE
+    - echo $DATACOVES__MAIN__DATABASE
 
   stage: build
   script:
@@ -43,14 +43,14 @@ generate_and_deploy_docs:
   - git config user.name GITLAB_USER_NAME
   - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
   - git config pull.rebase false  
-  - export DATACOVES__MAIN_DATABASE=$DATACOVES__PROD_DATABASE
-  - echo $DATACOVES__MAIN_DATABASE
+  - export DATACOVES__MAIN__DATABASE=$DATACOVES__PROD_DATABASE
+  - echo $DATACOVES__MAIN__DATABASE
   image: datacoves/ci-basic-dbt-snowflake:2
   
   script:
     - cd $DATACOVES__DBT_HOME
     - dbt deps
-    - echo $DATACOVES__MAIN_DATABASE
+    - echo $DATACOVES__MAIN__DATABASE
     - dbt build
     - dbt docs generate
     - cp -r target/* $CI_PROJECT_DIR
