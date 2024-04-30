@@ -49,8 +49,8 @@ generate_and_deploy_docs:
   
   script:
     - cd $DATACOVES__DBT_HOME
-    - ls
     - dbt deps
+    - echo $DATACOVES__MAIN_DATABASE
     - dbt build
     - dbt docs generate
     - cp -r target/* $CI_PROJECT_DIR
