@@ -26,6 +26,7 @@ build_and_test:
     - git fetch origin main
     - git diff origin/main HEAD --name-status 
     - cd $DATACOVES__DBT_HOME
+    - ls
     - dbt deps
     - dbt build --fail-fast
     - cd $CI_PROJECT_DIR
