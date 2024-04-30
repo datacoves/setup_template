@@ -1,7 +1,6 @@
 stages:
   - build
   - deploy
-
 variables:
   DBT_PROFILES_DIR: $CI_PROJECT_DIR/automate/dbt
   # DATACOVES__DBT_HOME: $CI_PROJECT_DIR/transform
@@ -21,7 +20,6 @@ build_and_test:
     - git config --global --add safe.directory $CI_PROJECT_DIR
     - cd $$CI_PROJECT_DIR
     - export DATACOVES__MAIN__DATABASE=$DATACOVES__TEST_DATABASE
-
   stage: build
   script:
     - git fetch origin main
@@ -37,6 +35,7 @@ build_and_test:
 
 generate_and_deploy_docs:
   stage: deploy
+  image: datacoves/ci-basic-dbt-snowflake:2
   before_script:
   - git config user.email $GITLAB_USER_EMAIL
   - git config user.name GITLAB_USER_NAME
@@ -44,8 +43,6 @@ generate_and_deploy_docs:
   - git config pull.rebase false  
   - export DATACOVES__MAIN__DATABASE=$DATACOVES__PROD_DATABASE
   - echo $DATACOVES__MAIN__DATABASE
-  image: datacoves/ci-basic-dbt-snowflake:2
-  
   script:
     - cd $DATACOVES__DBT_HOME
     - dbt deps
@@ -62,6 +59,5 @@ generate_and_deploy_docs:
     - git add run_results.json
     - git commit -m "Update dbt documentation"
     - git push --force https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs 
-
   only:
     - main
