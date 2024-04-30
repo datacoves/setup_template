@@ -59,7 +59,7 @@ generate_and_deploy_docs:
     - cd $CI_PROJECT_DIR
     - git add catalog.json
     - git add graph.gpickle
-      git add index.html
+    - git add index.html
     - git add manifest.json
     - git add run_results.json
     - git commit -m "Update dbt documentation"
