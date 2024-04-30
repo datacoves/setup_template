@@ -63,7 +63,8 @@ generate_and_deploy_docs:
     - git add manifest.json
     - git add run_results.json
     - git commit -m "Update dbt documentation"
+    - git push origin dbt-docs  
     - git pull --rebase origin dbt-docs
-    - git push https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs
+    - git push https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs  
   only:
     - main
