@@ -7,20 +7,22 @@ variables:
   # DATACOVES__DBT_HOME: $CI_PROJECT_DIR/transform
   DATACOVES__DBT_HOME: $CI_PROJECT_DIR
   DATACOVES__MAIN__ACCOUNT: $DATACOVES_MAIN_ACCOUNT
-  DATACOVES__MAIN__DATABASE: $DATACOVES_MAIN_DATABASE
   DATACOVES__MAIN__SCHEMA: $DATACOVES_MAIN_SCHEMA
   DATACOVES__MAIN__ROLE: $DATACOVES_MAIN_ROLE
   DATACOVES__MAIN__WAREHOUSE: $DATACOVES_MAIN_WAREHOUSE
   DATACOVES__MAIN__USER: $DATACOVES_MAIN_USER
   DATACOVES__MAIN__PASSWORD: $DATACOVES_MAIN_PASSWORD
+  TEST_DATABASE: $DATACOVES__TEST_DATABASE
+  PROD_DATABASE: $DATACOVES__PROD_DATABASE
 
-default:
+build_and_test:
   image: datacoves/ci-basic-dbt-snowflake:2
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
     - cd $$CI_PROJECT_DIR
+    - export DATACOVES__MAIN_DATABASE=$DATACOVES__TEST_DATABASE
+    - echo $DATACOVES__MAIN_DATABASE
 
-build_and_test:
   stage: build
   script:
     - git fetch origin main
@@ -41,6 +43,8 @@ generate_and_deploy_docs:
   - git config user.name GITLAB_USER_NAME
   - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
   - git config pull.rebase false  
+  - export DATACOVES__MAIN_DATABASE=$DATACOVES__PROD_DATABASE
+  - echo $DATACOVES__MAIN_DATABASE
   image: datacoves/ci-basic-dbt-snowflake:2
   
   script:
