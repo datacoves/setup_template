@@ -1,3 +1,9 @@
+#### Pre-reqs ####
+# Set the correct DBT_PROFILES_DIR based on the location of your dbt project
+# Set the correct image based on your data warehouse 
+# Add all required environment variables/secrets in your CI/CD preferences
+# Create the access token in user preferences and save it as a variable called GITLAB_PUSH_TOKEN in your CI/CD preferences.
+
 stages:
   - build
   - deploy

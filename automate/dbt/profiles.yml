@@ -5,7 +5,7 @@ default:
       type: snowflake
       threads: 16
       client_session_keep_alive: true
-
+      #### Snowflake ####
       account: "{{ env_var('DATACOVES__MAIN__ACCOUNT') }}"
       database: "{{ env_var('DATACOVES__MAIN__DATABASE') }}"
       schema: "{{ env_var('DATACOVES__MAIN__SCHEMA') }}"
