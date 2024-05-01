@@ -1,7 +1,7 @@
 #### Pre-reqs ####
 # Set the correct container based on your data warehouse 
 # Add all required environment variables/secrets in Github Actions
-
+# In the Datacoves environment settings enable the OBSERVE tab to see production docs
 name: Perform deployment to production
 
 on:  # yamllint disable-line rule:truthy
