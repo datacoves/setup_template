@@ -1,3 +1,7 @@
+#### Pre-reqs ####
+# Set the correct container based on your data warehouse 
+# Add all required environment variables/secrets in Github Actions
+
 name: Perform deployment to production
 
 on:  # yamllint disable-line rule:truthy
@@ -26,7 +30,8 @@ jobs:
     # Alternatively, You can define multiple ENV for different workflows.
     # https://github.com/<org>/<repo>/settings/environments
     # environment: PR_ENV
-    container: datacoves/ci-basic-dbt-snowflake:2.3
+    container: datacoves/ci-basic-dbt-snowflake:2.2
+    #container: datacoves/ci-basic-dbt-redshift:2.2
 
     defaults:
       run:
@@ -59,7 +64,7 @@ jobs:
       # DATACOVES__MAIN__HOST: "{{ env_var('DB_HOST') }}"
       # DATACOVES__MAIN__USER: "{{ env_var('DB_USER') }}"
       # DATACOVES__MAIN__PASSWORD: "{{ env_var('DB_PASSWORD') }}"
-      # DATACOVES__TEST__DATABASE: "{{ env_var('DB_DATABASE') }}"
+      # DATACOVES__MAIN__DATABASE: "{{ env_var('PROD_DATABASE') }}"
       # DATACOVES__MAIN__SCHEMA: "{{ env_var('DB_SCHEMA') }}"
 
     steps:

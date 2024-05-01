@@ -1,3 +1,7 @@
+#### Pre-reqs ####
+# Set the correct container based on your data warehouse 
+# Add all required environment variables/secrets in Github Actions
+
 name: Test and Check on Pull Request
 
 on:  # yamllint disable-line rule:truthy
@@ -16,7 +20,8 @@ jobs:
     name: Pull Request dbt Tests
     runs-on: ubuntu-latest
 
-    container: datacoves/ci-basic-dbt-snowflake:2.3
+    container: datacoves/ci-basic-dbt-snowflake:2.2
+    #container: datacoves/ci-basic-dbt-redshift:2.2
 
     defaults:
       run:
@@ -33,7 +38,7 @@ jobs:
       ##### Snowflake #####
       DATACOVES__MAIN__ACCOUNT:   ${{ vars.DB_ACCOUNT }}
 
-      DATACOVES__TEST__DATABASE:  ${{ vars.PROD_DATABASE }}
+      DATACOVES__MAIN__DATABASE:  ${{ vars.TEST_DATABASE }}
       DATACOVES__MAIN__SCHEMA:    ${{ vars.DB_SCHEMA }}
 
       DATACOVES__MAIN__ROLE:      ${{ vars.DB_ROLE }}
@@ -46,9 +51,8 @@ jobs:
       # DATACOVES__MAIN__HOST: "{{ env_var('DB_HOST') }}"
       # DATACOVES__MAIN__USER: "{{ env_var('DB_USER') }}"
       # DATACOVES__MAIN__PASSWORD: "{{ env_var('DB_PASSWORD') }}"
-      # DATACOVES__TEST__DATABASE: "{{ env_var('DB_DATABASE') }}"
+      # DATACOVES__MAIN__DATABASE: "{{ env_var('TEST_DATABASE') }}"
       # DATACOVES__MAIN__SCHEMA: "{{ env_var('DB_SCHEMA') }}"
-
 
     steps:
       - name: Checkout branch
