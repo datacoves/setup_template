@@ -21,7 +21,8 @@ variables:
   # DATACOVES__MAIN__SCHEMA: "{{ env_var('DB_SCHEMA') }}"
 
 build_and_test:
-  image: datacoves/ci-basic-dbt-snowflake:2
+  image: datacoves/ci-basic-dbt-snowflake:2.2
+  # image: datacoves/ci-basic-dbt-redshift:2.2
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
     - cd $CI_PROJECT_DIR
@@ -41,7 +42,8 @@ build_and_test:
 
 generate_and_deploy_docs:
   stage: deploy
-  image: datacoves/ci-basic-dbt-snowflake:2
+  image: datacoves/ci-basic-dbt-snowflake:2.2
+  # image: datacoves/ci-basic-dbt-snowflake:2.2
   before_script:
   - git config user.email $GITLAB_USER_EMAIL
   - git config user.name $GITLAB_USER_NAME
