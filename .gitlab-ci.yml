@@ -11,14 +11,12 @@ variables:
   DATACOVES__MAIN__WAREHOUSE: $DB_WAREHOUSE
   DATACOVES__MAIN__USER: $DB_USER
   DATACOVES__MAIN__PASSWORD: $DB_PASSWORD
-  DATACOVES__TEST_DATABASE: $TEST_DATABASE
-  DATACOVES__PROD_DATABASE: $PROD_DATABASE
 
 build_and_test:
   image: datacoves/ci-basic-dbt-snowflake:2
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
-    - cd $$CI_PROJECT_DIR
+    - cd $CI_PROJECT_DIR
     - export DATACOVES__MAIN__DATABASE=$DATACOVES__TEST_DATABASE
   stage: build
   script:
@@ -38,11 +36,10 @@ generate_and_deploy_docs:
   image: datacoves/ci-basic-dbt-snowflake:2
   before_script:
   - git config user.email $GITLAB_USER_EMAIL
-  - git config user.name GITLAB_USER_NAME
+  - git config user.name $GITLAB_USER_NAME
   - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
   - git config pull.rebase false  
   - export DATACOVES__MAIN__DATABASE=$DATACOVES__PROD_DATABASE
-  - echo $DATACOVES__MAIN__DATABASE
   script:
     - cd $DATACOVES__DBT_HOME
     - dbt deps
