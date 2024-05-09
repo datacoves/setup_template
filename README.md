@@ -4,7 +4,7 @@ Welcome to the Datacoves Starter Project! This repository is designed to help us
 
 ## About Datacoves
 
-Datacoves is an [enterprise dbt DataOps platform](https://datacoves.com/product) which helps enterprises overcome their data delivery challenges quickly using dbt and Airflow, implementing best practices from the start without the need for multiple vendors or costly consultants.  
+Datacoves is an [enterprise dbt DataOps platform](https://datacoves.com/product) which helps organizations overcome their data delivery challenges quickly using dbt and Airflow, implementing best practices from the start without the need for multiple vendors or costly consultants.  
 
 ## Getting Started
 
@@ -27,7 +27,7 @@ To make us of this repo on your dbt journey with Datacoves, follow these steps:
 4. **Customize Your Project**:
    - Define your data models in the `models` directory using SQL files. Organize your models according to your data warehouse schema and naming conventions.
 
-5. **Run dbt**:
+5. **Run dbt (once your repo is cloned into Datacoves)**:
    - Execute your dbt transformations using the `dbt debug` command within the repository directory. 
    - Execute your dbt transformations using the `dbt run` command within the repository directory. This will compile your SQL models and execute them against your Datacoves warehouse.
 
