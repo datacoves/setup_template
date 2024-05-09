@@ -40,6 +40,5 @@ To make us of this repo on your dbt journey with Datacoves, follow these steps:
 
 - [Datacoves Documentation](https://docs.Datacoves.com)
 - [dbt Documentation](https://docs.getdbt.com)
-- [GitHub Repository](https://github.com/yourusername/Datacoves-starter-project)
 
 Happy modeling! 🚀
