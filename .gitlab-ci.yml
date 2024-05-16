@@ -21,10 +21,10 @@ variables:
   DATACOVES__MAIN__PASSWORD: $DB_PASSWORD
 
   #### Redshift #####
-  # DATACOVES__MAIN__HOST: "{{ env_var('DB_HOST') }}"
-  # DATACOVES__MAIN__USER: "{{ env_var('DB_USER') }}"
-  # DATACOVES__MAIN__PASSWORD: "{{ env_var('DB_PASSWORD') }}"
-  # DATACOVES__MAIN__SCHEMA: "{{ env_var('DB_SCHEMA') }}"
+  # DATACOVES__MAIN__HOST: $DB_HOST
+  # DATACOVES__MAIN__USER: $DB_USER
+  # DATACOVES__MAIN__PASSWORD: $DB_PASSWORD
+  # DATACOVES__MAIN__SCHEMA: $DB_SCHEMA
 
 build_and_test:
   image: datacoves/ci-basic-dbt-snowflake:2.2
