@@ -19,7 +19,7 @@ To make us of this repo on your dbt journey with Datacoves, follow these steps:
 2.  **Configure your CICD**:
    - Edit your gitlab-ci,yml or .github/workflows files based on your Data Warehouse and dbt project location. This will involve commenting and uncommenting lines of code in the files.
    - Configure your workflow environment variables in Gitlab or Github. See .gitlab-ci,yml or .github/workflows.
-
+     
 3. **Configure dbt**:
    - Configure dbt for your Datacoves environment by editing the `profiles.yml` file in the `automate/dbt/` directory. Ensure you provide accurate connection details for your Data Warehouse.
    - Configure your dbt_project.yml with your information.
@@ -34,7 +34,6 @@ To make us of this repo on your dbt journey with Datacoves, follow these steps:
 6. **Explore and Iterate**:
    - Explore the results of your data transformations in Datacoves.
    - Iterate on your data models as needed, making adjustments and improvements based on insights gained.
-
 
 ## Resources
 
