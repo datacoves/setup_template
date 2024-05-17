@@ -10,6 +10,15 @@ stages:
 variables:
   DBT_PROFILES_DIR: $CI_PROJECT_DIR/automate/dbt
   DATACOVES__DBT_HOME: $CI_PROJECT_DIR
+  # DATACOVES__DBT_HOME: $CI_PROJECT_DIR/transform
+
+  ##### Snowflake #####
+  # DATACOVES__MAIN__ACCOUNT: $DB_ACCOUNT
+  # DATACOVES__MAIN__SCHEMA: $DB_SCHEMA
+  # DATACOVES__MAIN__ROLE: $DB_ROLE
+  # DATACOVES__MAIN__WAREHOUSE: $DB_WAREHOUSE
+  # DATACOVES__MAIN__USER: $DB_USER
+  # DATACOVES__MAIN__PASSWORD: $DB_PASSWORD
 
   #### Redshift #####
   DATACOVES__MAIN__HOST: $DB_HOST
@@ -19,6 +28,7 @@ variables:
   DATACOVES__MAIN__DATABASE: $DB_DATABASE
 
 build_and_test:
+  # image: datacoves/ci-basic-dbt-snowflake:2.2
   image: datacoves/ci-basic-dbt-redshift:2.2
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
@@ -40,6 +50,7 @@ build_and_test:
 
 generate_and_deploy_docs:
   stage: deploy
+  # image: datacoves/ci-basic-dbt-snowflake:2.2
   image: datacoves/ci-basic-dbt-redshift:2.2
   before_script:
   - git config user.email $GITLAB_USER_EMAIL
