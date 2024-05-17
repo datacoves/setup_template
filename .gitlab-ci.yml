@@ -13,31 +13,33 @@ variables:
   DATACOVES__DBT_HOME: $CI_PROJECT_DIR
 
   ##### Snowflake #####
-  DATACOVES__MAIN__ACCOUNT: $DB_ACCOUNT
-  DATACOVES__MAIN__SCHEMA: $DB_SCHEMA
-  DATACOVES__MAIN__ROLE: $DB_ROLE
-  DATACOVES__MAIN__WAREHOUSE: $DB_WAREHOUSE
-  DATACOVES__MAIN__USER: $DB_USER
-  DATACOVES__MAIN__PASSWORD: $DB_PASSWORD
-
-  #### Redshift #####
-  # DATACOVES__MAIN__HOST: $DB_HOST
+  # DATACOVES__MAIN__ACCOUNT: $DB_ACCOUNT
+  # DATACOVES__MAIN__SCHEMA: $DB_SCHEMA
+  # DATACOVES__MAIN__ROLE: $DB_ROLE
+  # DATACOVES__MAIN__WAREHOUSE: $DB_WAREHOUSE
   # DATACOVES__MAIN__USER: $DB_USER
   # DATACOVES__MAIN__PASSWORD: $DB_PASSWORD
-  # DATACOVES__MAIN__SCHEMA: $DB_SCHEMA
+
+  #### Redshift #####
+  DATACOVES__MAIN__HOST: $DB_HOST
+  DATACOVES__MAIN__USER: $DB_USER
+  DATACOVES__MAIN__PASSWORD: $DB_PASSWORD
+  DATACOVES__MAIN__SCHEMA: $DB_SCHEMA
+  DATACOVES__MAIN__DATABASE: $DB_DATABASE
+
 
 build_and_test:
-  image: datacoves/ci-basic-dbt-snowflake:2.2
-  # image: datacoves/ci-basic-dbt-redshift:2.2
+  # image: datacoves/ci-basic-dbt-snowflake:2.2
+  image: datacoves/ci-basic-dbt-redshift:2.2
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
     - cd $CI_PROJECT_DIR
-    - export DATACOVES__MAIN__DATABASE=$TEST_DATABASE
   stage: build
   script:
     - git fetch origin main
     - git diff origin/main HEAD --name-status 
     - cd $DATACOVES__DBT_HOME
+    - dbt debug
     - dbt deps
     - dbt build --fail-fast
     - cd $CI_PROJECT_DIR
