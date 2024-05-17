@@ -1,7 +1,8 @@
- target: default_target
+default:
+  target: default_target
   outputs:
     default_target:
-      #### Snowflake ####
+    #### Snowflake ####
       # type: snowflake
       # account: "{{ env_var('DATACOVES__MAIN__ACCOUNT') }}"
       # database: "{{ env_var('DATACOVES__MAIN__DATABASE') }}"
