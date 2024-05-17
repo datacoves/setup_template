@@ -36,6 +36,7 @@ build_and_test:
     - pre-commit run --files $CHANGED_FILES --config .pre-commit-config.yaml
   only:
     - merge_requests
+  interruptible: true
 
 generate_and_deploy_docs:
   stage: deploy
@@ -63,3 +64,4 @@ generate_and_deploy_docs:
     - git push --force https://oauth2:$GITLAB_PUSH_TOKEN@$project_url dbt-docs 
   only:
     - main
+  interruptible: true
