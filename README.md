@@ -35,7 +35,6 @@ To make us of this repo on your dbt journey with Datacoves, follow these steps:
    - Explore the results of your data transformations in Datacoves.
    - Iterate on your data models as needed, making adjustments and improvements based on insights gained.
 
-
 ## Resources
 
 - [Datacoves Documentation](https://docs.Datacoves.com)
