@@ -28,8 +28,6 @@ build_and_test:
     - git fetch origin main
     - git diff origin/main HEAD --name-status 
     - cd $DATACOVES__DBT_HOME
-    - ls
-    - echo $DATACOVES__MAIN__HOST
     - dbt debug
     - dbt deps
     - dbt build --fail-fast
