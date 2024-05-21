@@ -4,6 +4,9 @@ models:
   - name: my_model
     description: test model
     columns:
+      - name: _airbyte_extracted_at
+      - name: _airbyte_meta
+      - name: _airbyte_raw_id
       - name: addr_state
         description: The state in which the borrower resides
       - name: annual_inc
