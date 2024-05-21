@@ -2,6 +2,7 @@ version: 2
 
 sources:
   - name: loans
+    schema: public
     tags:
       - daily_run_airbyte
     tables:
