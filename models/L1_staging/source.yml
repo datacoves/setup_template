@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: loans
+    tags:
+      - daily_run_airbyte
+    tables:
+      - name: personal_loans
+        description: 'Personal Loans data'
