@@ -8,7 +8,7 @@ Datacoves is an [enterprise dbt DataOps platform](https://datacoves.com/product)
 
 ## Getting Started
 
-To make us of this repo on your dbt journey with Datacoves, follow these steps:
+To make use of this repo on your dbt journey with Datacoves, follow these steps:
 
 1. **Clone This Repository**:
    - Clone this repository to your local machine using the command:
@@ -18,7 +18,14 @@ To make us of this repo on your dbt journey with Datacoves, follow these steps:
 
 2.  **Configure your CICD**:
    - Edit your gitlab-ci,yml or .github/workflows files based on your Data Warehouse and dbt project location. This will involve commenting and uncommenting lines of code in the files.
-   - Configure your workflow environment variables in Gitlab or Github. See .gitlab-ci,yml or .github/workflows.
+   - For Gitlab users: Generate your Personal Access token.
+      - Head to user > preferences > Access Tokens 
+      - Name the Token `GITLAB_PUSH_TOKEN`
+      - Select the expiration data
+      - Select api, read_repository, write_repository
+      - Copy the token since it will not be viewable once you navigate from that screen
+      - Configure the `GITLAB_PUSH_TOKEN` variable in your workflow environment. Settings > CICD > Variables. Be sure to select Masked for sensitive values.
+   - Configure your workflow environment variables in Gitlab or Github. See .gitlab-ci,yml or .github/workflows. Be sure to select Masked for sensitive values in gitlab or set secrets in github.
      
 3. **Configure dbt**:
    - Configure dbt for your Datacoves environment by editing the `profiles.yml` file in the `automate/dbt/` directory. Ensure you provide accurate connection details for your Data Warehouse.
