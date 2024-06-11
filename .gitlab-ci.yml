@@ -43,6 +43,7 @@ build_and_test:
     - dbt build --fail-fast
     - cd $CI_PROJECT_DIR
     - CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME HEAD)
+    - dbt docs generate
     - pre-commit run --files $CHANGED_FILES --config .pre-commit-config.yaml
   only:
     - merge_requests
