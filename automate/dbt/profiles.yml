@@ -3,25 +3,25 @@ default:
   outputs:
     default_target:
     #### Snowflake ####
-      # type: snowflake
-      # account: "{{ env_var('DATACOVES__MAIN__ACCOUNT') }}"
-      # database: "{{ env_var('DATACOVES__MAIN__DATABASE') }}"
-      # schema: "{{ env_var('DATACOVES__MAIN__SCHEMA') }}"
-      # user: "{{ env_var('DATACOVES__MAIN__USER') }}"
-      # password: "{{ env_var('DATACOVES__MAIN__PASSWORD') }}"
-      # role: "{{ env_var('DATACOVES__MAIN__ROLE') }}"
-      # warehouse: "{{ env_var('DATACOVES__MAIN__WAREHOUSE') }}"
-      # threads: 16
-      # client_session_keep_alive: true
-    
-    #### Redshift ####
-      type: redshift
-      host: "{{ env_var('DATACOVES__MAIN__HOST') }}"
+      type: snowflake
+      account: "{{ env_var('DATACOVES__MAIN__ACCOUNT') }}"
+      database: "{{ env_var('DATACOVES__MAIN__DATABASE') }}"
+      schema: "{{ env_var('DATACOVES__MAIN__SCHEMA') }}"
       user: "{{ env_var('DATACOVES__MAIN__USER') }}"
       password: "{{ env_var('DATACOVES__MAIN__PASSWORD') }}"
-      dbname: "{{ env_var('DATACOVES__MAIN__DATABASE') }}"
-      schema: "{{ env_var('DATACOVES__MAIN__SCHEMA') }}"
-      port: 5439
-      threads: 4
-      keepalives_idle: 240
-      connect_timeout: 900
+      role: "{{ env_var('DATACOVES__MAIN__ROLE') }}"
+      warehouse: "{{ env_var('DATACOVES__MAIN__WAREHOUSE') }}"
+      threads: 16
+      client_session_keep_alive: true
+    
+    #### Redshift ####
+      # type: redshift
+      # host: "{{ env_var('DATACOVES__MAIN__HOST') }}"
+      # user: "{{ env_var('DATACOVES__MAIN__USER') }}"
+      # password: "{{ env_var('DATACOVES__MAIN__PASSWORD') }}"
+      # dbname: "{{ env_var('DATACOVES__MAIN__DATABASE') }}"
+      # schema: "{{ env_var('DATACOVES__MAIN__SCHEMA') }}"
+      # port: 5439
+      # threads: 4
+      # keepalives_idle: 240
+      # connect_timeout: 900
