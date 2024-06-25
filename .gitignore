@@ -20,7 +20,6 @@ env/
 
 scripts/
 
-
 # logs
 *.log
 logs/
