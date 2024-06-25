@@ -3,31 +3,31 @@ ci_provider:
   choices:
     - github
     - gitlab
-  when: "{% if 'setup_ci_cd' in services%}true{%endif%}"
+  when: "{% if setup_ci_cd %}true{%endif%}"
   help: Which CI/CD provider are you using?
 
 dags_path:
   type: str
-  when: "{% if 'setup_airflow_dag' in services%}true{%endif%}"
+  when: "{% if setup_airflow_dag %}true{%endif%}"
   default: "{{airflow_dags_path}}"
   help: Where do you want Airflow DAGs to be stored?
 
 use_dbt_checkpoint:
   type: bool
   default: false
-  when: "{% if 'setup_precommit' in services%}true{%endif%}"
+  when: "{% if setup_precommit %}true{%endif%}"
   help: Do you want to use dbt-checkpoint?
 
 use_sqlfluff:
   type: bool
   default: false
-  when: "{% if 'setup_precommit' in services%}true{%endif%}"
+  when: "{% if setup_precommit %}true{%endif%}"
   help: Do you want to use Sqlfluff?
 
 use_yamllint:
   type: bool
   default: false
-  when: "{% if 'setup_precommit' in services%}true{%endif%}"
+  when: "{% if setup_precommit %}true{%endif%}"
   help: Do you want to use Yamllint?
 
 dbt_adapter:
@@ -38,7 +38,7 @@ dbt_adapter:
     - redshift
     - databricks
   help: What dbt adapter are you using?
-  when: "{{not dbt_adapter and ('setup_dbt_profile' in services or 'setup_ci_cd' in services or use_sqlfluff)}}"
+  when: "{{not dbt_adapter and (setup_dbt_profile or setup_ci_cd or use_sqlfluff)}}"
 
 comma_style:
   type: str
