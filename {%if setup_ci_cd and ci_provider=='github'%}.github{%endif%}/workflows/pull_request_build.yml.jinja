@@ -32,15 +32,15 @@ jobs:
 
     defaults:
       run:
-        # working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform
-        {% raw %} working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
+        {%raw%}# working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform{%endraw%}
+        {% raw %} working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}
 
     env:
       {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/automate/dbt{%endraw%}
       # If your dbt project is at the root.
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }} {%endraw%}
       # # If your dbt project is inside a transform directory.
-    #   DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform 
+      {%raw%}#DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform {%endraw%}
 
       {% if 'snowflake' in dbt_adapter %}
       {% raw %}DATACOVES__MAIN__ACCOUNT: ${{ vars.DB_ACCOUNT }}
@@ -89,5 +89,8 @@ jobs:
         run: "dbt build --fail-fast"
 
       - name: Run governance checks
+        {% raw %}run: "pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref HEAD"{% endraw %}
+
+      - name: Run governance checks 2
         {% raw %}run: "pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref HEAD"{% endraw %}
 
