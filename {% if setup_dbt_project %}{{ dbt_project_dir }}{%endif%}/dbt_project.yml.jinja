@@ -20,8 +20,8 @@ snapshot-paths: ["snapshots"]
 
 target-path: "target" # directory which will store compiled SQL files
 clean-targets: # directories to be removed by `dbt clean`
-- "target"
-- "dbt_packages"
+  - "target"
+  - "dbt_packages"
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -31,13 +31,15 @@ clean-targets: # directories to be removed by `dbt clean`
 # The configuration below will override this setting for models in the example folder to
 # instead be materialized as tables. Any models you add to the root of the models folder will
 # continue to be built as views. These settings can be overridden in the individual model files
-# using the `{{ config(...) }}` macro.
+# using the `{%raw%}{{ config(...) }}{%endraw%}` macro.
 
 models:
-datacoves_starter_project: # project name (Change this to your project name)
-L1_staging:
-+materialized: view
-L2_core:
-+materialized: view
-L3_marts:
-+materialized: table
+  datacoves_starter_project:
+    L1_staging:
+      +materialized: view
+    L2_core:
+      +materialized: view
+    L3_marts:
+      +materialized: table
+    L4_test:
+      +materialized: table
