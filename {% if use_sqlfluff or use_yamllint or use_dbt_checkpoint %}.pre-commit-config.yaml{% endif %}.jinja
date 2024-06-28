@@ -1,7 +1,7 @@
 files: ^{{ dbt_project_dir }}/models/
 
 repos:
-if {% use_dbt_checkpoint %}
+{% if use_dbt_checkpoint %}
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
     rev: v2.0.1
 
