@@ -10,7 +10,6 @@ stages:
 variables:
   DBT_PROFILES_DIR: $CI_PROJECT_DIR/automate/dbt
   DATACOVES__DBT_HOME: $CI_PROJECT_DIR
-  # DATACOVES__DBT_HOME: $CI_PROJECT_DIR/transform
 
   {% if 'snowflake' in dbt_adapter %}
   DATACOVES__MAIN__ACCOUNT: $DB_ACCOUNT

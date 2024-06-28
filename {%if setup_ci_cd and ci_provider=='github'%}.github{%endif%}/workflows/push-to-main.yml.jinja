@@ -40,18 +40,11 @@ jobs:
     {% endif %}
     defaults:
       run:
-        # If your dbt project is at the root.
-        {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}
-
-        # # If your dbt project is inside a transform directory.
-        {% raw %}# working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform{% endraw%}
+        {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_project_dir}}
 
     env:
-      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/automate/dbt{% endraw%}
-      # If your dbt project is at the root.
-      {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}
-      # # If your dbt project is inside a transform directory.
-      {% raw %}#   DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/transform{% endraw%}
+      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{airflow_profile_path}}
+      {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_project_dir}}
 
       {% if 'snowflake' in dbt_adapter %}
       {% raw %}DATACOVES__MAIN__ACCOUNT: ${{ vars.DB_ACCOUNT }}
