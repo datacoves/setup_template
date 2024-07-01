@@ -51,8 +51,6 @@ jobs:
 
       - name: Debugging ls
         run: |
-          ls -lha $DBT_PROFILES_DIR
-          ls -lha $DATACOVES__DBT_HOME
           ls -lha ./generated
           ls -lha .
       # run dbt debug and dbt compile
