@@ -46,12 +46,7 @@ jobs:
 
       - name: Run Copier
         run: |
-          copier --defaults -d setup_dbt_project=True -d setup_dbt_profile=True -d setup_ci_cd=True 
-          -d setup_precommit=True -d setup_airflow_dag=True -d dbt_project_dir="." -d dbt_project_name="balboa" 
-          -d is_new_project=True  -d airflow_profile_path="automate/dbt" 
-          -d yml_dags_path="orchestrate/dag_yml_definitions" -d dags_path="orchestrate/dags" 
-          -d setup_precommit=True -d use_sqlfluff=True -d use_yamllint=True -d use_dbt_checkpoint=True 
-          -a ../copier-answers.yml copy ./ generated/
+          copier --defaults -d setup_dbt_project=True -d setup_dbt_profile=True -d setup_ci_cd=True -d setup_precommit=True -d setup_airflow_dag=True -d dbt_project_dir="." -d dbt_project_name="balboa" -d is_new_project=True  -d airflow_profile_path="automate/dbt" -d yml_dags_path="orchestrate/dag_yml_definitions" -d dags_path="orchestrate/dags" -d setup_precommit=True -d use_sqlfluff=True -d use_yamllint=True -d use_dbt_checkpoint=True -a ../copier-answers.yml copy ./ generated/
 
       # run dbt debug and dbt compile
       - name: Run dbt commands
@@ -63,8 +58,7 @@ jobs:
       # run `dbt-coves generate airflow dags`
       - name: Generate dags
         run: |
-          dbt-coves generate airflow-dags --yml-path generated/orchestrate/dag_yml_definitions/sample_dag.yml 
-          --dags-path generated/orchestrate/dags
+          dbt-coves generate airflow-dags --yml-path generated/orchestrate/dag_yml_definitions/sample_dag.yml --dags-path generated/orchestrate/dags
 
       # fill Airflow DagBag with the result of generated dags
       # - name: Load dags
