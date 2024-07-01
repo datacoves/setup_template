@@ -27,17 +27,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r ci_requirements.txt
 
-      - name: Mk generated dir and place answers
-        run: |
-          mkdir -p generated
-          cp copier-answers.yml generated/copier-answers.yml
+      # - name: Mk generated dir and place answers
+      #   run: |
+      #     mkdir -p generated
+      #     cp copier-answers.yml generated/copier-answers.yml
 
       - name: Run Copier
         run: |
           copier -d setup_dbt_project=True -d setup_dbt_profile=True -d setup_ci_cd=True -d setup_precommit=True 
           -d setup_airflow_dag=True -d dbt_project_dir="." -d dbt_project_name="balboa" -d is_new_project=True  
           -d airflow_profile_path="automate/dbt" -d yml_dags_path="orchestrate/dag_yml_definitions" 
-          -d dags_path="orchestrate/dags" -a copier-answers.yml copy git@github.com:datacoves/setup_template.git generated/
+          -d dags_path="orchestrate/dags" -a copier-answers.yml copy git@github.com:datacoves/setup_template.git ./
 
       # run dbt debug and dbt compile
       - name: Run dbt commands
