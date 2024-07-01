@@ -39,6 +39,6 @@ generate:
 
 extract:
   airbyte:
-    path: /config/workspace/load/airbyte
+    # path: /config/workspace/load/airbyte
     host: "{{ env_var('DATACOVES__AIRBYTE_HOST_NAME') }}"
     port: "{{ env_var('DATACOVES__AIRBYTE_PORT') }}"

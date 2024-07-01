@@ -64,8 +64,7 @@ jobs:
       # run `dbt-coves generate airflow dags`
       - name: Generate dags
         run: |
-          dbt-coves generate airflow-dags --yml-path generated/orchestrate/dag_yml_definitions/sample_dag.yml 
-          --dags-path generated/orchestrate/dags
+          dbt-coves generate airflow-dags --yml-path generated/orchestrate/dag_yml_definitions/sample_dag.yml --dags-path generated/orchestrate/dags
 
       # fill Airflow DagBag with the result of generated dags
       - name: Load dags
