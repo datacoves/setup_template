@@ -52,7 +52,8 @@ jobs:
       - name: Debugging ls
         run: |
           ls -lha ./generated
-          ls -lha .
+          cd ./generated
+          pwd
       # run dbt debug and dbt compile
       - name: Run dbt commands
         run: |
