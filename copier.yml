@@ -1,3 +1,9 @@
+_exclude:
+  - ci_answers.yml
+  - .github/
+  - ci_requirements.txt
+  - test_load_dagbag.py
+
 ci_provider:
   type: str
   choices:

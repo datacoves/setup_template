@@ -1,0 +1,7 @@
+ci_provider: github
+dags_path: orchestrate/dags
+dbt_adapter: snowflake
+use_dbt_checkpoint: true
+use_sqlfluff: true
+use_yamllint: true
+yml_dags_path: orchestrate/dag_yml_definitions
