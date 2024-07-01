@@ -8,8 +8,8 @@ on:
 jobs:
   Test_Template_Integrity:
     env:
-      DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/generated/automate/dbt
-      DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/generated
+      DBT_PROFILES_DIR: /home/runner/work/setup_template/setup_template/generated/automate/dbt
+      DATACOVES__DBT_HOME: /home/runner/work/setup_template/setup_template/generated
 
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
 
