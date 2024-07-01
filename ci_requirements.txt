@@ -1,5 +1,4 @@
-# dbt-coves==1.8.0
-git+https://github.com/datacoves/dbt-coves.git@DCV-2515-dbt-coves-setup-datacoves
+dbt-coves==1.7.10
 dbt-core==1.7.17
 dbt-snowflake==1.7.5
 pre-commit==3.7.1

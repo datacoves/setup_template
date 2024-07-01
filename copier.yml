@@ -1,5 +1,5 @@
 _exclude:
-  - ci_answers.yml
+  - copier-answers.yml
   - .github/
   - ci_requirements.txt
   - test_load_dagbag.py
@@ -16,14 +16,12 @@ ci_provider:
 dags_path:
   type: str
   when: "{{airflow_dags_confirm_path}}"
-  # when: "{% if airflow_dags_confirm_path %}true{%endif%}"
   default: "{{tentative_dags_path}}"
   help: Airflow DAGs path
 
 yml_dags_path:
   type: str
   when: "{{yml_dags_confirm_path}}"
-  # when: "{% if yml_dags_confirm_path %}true{%endif%}"
   default: "{{tentative_yml_dags_path}}"
   help: Airflow YML Dags path
 
