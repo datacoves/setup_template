@@ -3,19 +3,18 @@ name: Test template
 on:
   workflow_dispatch:
   pull_request:
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout branch
+        uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            .github
-            copier-answers.yml
-            ci_requirements.txt
-            test_load_dagbag.py
+          ref: ${{ github.event.push.head.sha }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,7 +33,7 @@ jobs:
 
       - name: Run Copier
         run: |
-          copier --defaults -d setup_dbt_project=True -d setup_dbt_profile=True -d setup_ci_cd=True -d setup_precommit=True -d setup_airflow_dag=True -d dbt_project_dir="." -d dbt_project_name="balboa" -d is_new_project=True  -d airflow_profile_path="automate/dbt" -d yml_dags_path="orchestrate/dag_yml_definitions" -d dags_path="orchestrate/dags" -a copier-answers.yml copy https://github.com/datacoves/setup_template.git ./
+          copier --defaults -d setup_dbt_project=True -d setup_dbt_profile=True -d setup_ci_cd=True -d setup_precommit=True -d setup_airflow_dag=True -d dbt_project_dir="." -d dbt_project_name="balboa" -d is_new_project=True  -d airflow_profile_path="automate/dbt" -d yml_dags_path="orchestrate/dag_yml_definitions" -d dags_path="orchestrate/dags" -a ../copier-answers.yml copy ./ generated/
 
       # run dbt debug and dbt compile
       - name: Run dbt commands
