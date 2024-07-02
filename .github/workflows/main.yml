@@ -57,7 +57,11 @@ jobs:
 
       #fill Airflow DagBag with the result of generated dags
       - name: Load dags
-        run: python test_load_dagbag.py
+        run: |
+          export
+          whoami
+          airflow config list | grep plugin
+          python test_load_dagbag.py
 
       # run pre-commit
       - name: Run pre-commit
