@@ -9,7 +9,7 @@ jobs:
   test:
     name: Test Template Integrity
     runs-on: ubuntu-latest
-    container: datacoves/ci-airflow-dbt-snowflake:3.1.202407021510-fdfc55bc
+    container: datacoves/ci-airflow-dbt-snowflake:3
     env:
       DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/generated/automate/dbt
       DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/generated
