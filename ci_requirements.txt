@@ -2,4 +2,3 @@ dbt-coves==1.7.10
 dbt-core==1.7.17
 dbt-snowflake==1.7.5
 pre-commit==3.7.1
-apache-airflow==2.8.4
