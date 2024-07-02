@@ -9,7 +9,7 @@ jobs:
   test:
     name: Test Template Integrity
     runs-on: ubuntu-latest
-    container: datacoves/ci-airflow-dbt-snowflake:3.1.202407021707-76aade22
+    container: datacoves/ci-airflow-dbt-snowflake:3
     env:
       DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/generated/automate/dbt
       DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/generated
@@ -57,11 +57,7 @@ jobs:
 
       #fill Airflow DagBag with the result of generated dags
       - name: Load dags
-        run: |
-          export
-          whoami
-          airflow config list | grep plugin
-          python test_load_dagbag.py
+        run: python test_load_dagbag.py
 
       # run pre-commit
       - name: Run pre-commit
