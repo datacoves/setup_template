@@ -22,7 +22,7 @@ jobs:
       DATACOVES__MAIN__USER: ${{ vars.DATACOVES__MAIN__USER }}
       DATACOVES__MAIN__PASSWORD: ${{ secrets.DATACOVES__MAIN__PASSWORD }}
     runs-on: ubuntu-latest
-    container: datacoves/ci-airflow-dbt-snowflake:2
+    container: datacoves/ci-airflow-dbt-snowflake:3
 
     steps:
       - name: Checkout branch
@@ -60,9 +60,9 @@ jobs:
         run: |
           dbt-coves generate airflow-dags --yml-path generated/orchestrate/dag_yml_definitions/sample_dag.yml --dags-path generated/orchestrate/dags
 
-      # fill Airflow DagBag with the result of generated dags
-      # - name: Load dags
-      #   run: python test_load_dagbag.py #TODO: uncomment once absence of Datacoves Operators is fixed
+      #fill Airflow DagBag with the result of generated dags
+      - name: Load dags
+        run: python test_load_dagbag.py
 
       # run pre-commit
       - name: Run pre-commit
