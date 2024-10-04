@@ -1,10 +1,10 @@
 _exclude:
   - copier-answers.yml
-  - .github/
+  - .github
   - ci_requirements.txt
   - test_load_dagbag.py
   - copier.yml
-  - .git/
+  - .git
 
 ci_provider:
   type: str
