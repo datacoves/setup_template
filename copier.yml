@@ -4,6 +4,7 @@ _exclude:
   - ci_requirements.txt
   - test_load_dagbag.py
   - copier.yml
+  - .git/
 
 ci_provider:
   type: str
@@ -52,13 +53,13 @@ add_dbtcoves_config_and_templates:
 
 setup_dbtcoves_config:
   type: bool
-  default: false
+  default: true
   when: "{{setup_dbt_coves}}"
   help: Setup dbt-coves config?
 
 setup_dbtcoves_templates:
   type: bool
-  default: false
+  default: true
   when: "{{setup_dbt_coves}}"
   help: Setup dbt-coves templates?
 
