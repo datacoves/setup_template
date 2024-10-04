@@ -23,6 +23,7 @@ generate:
     dags_path: "/config/workspace/{{ env_var('DATACOVES__AIRFLOW_DAGS_PATH') }}"
 
     # UNCOMMENT THE FOLLOWING LINES TO ENABLE AIRFLOW DAGS GENERATION
+    # BASED ON AIRBYTE AND FIVETRAN CONNECTIONS
     # generators_params:
     #   AirbyteDbtGenerator:
     #     host: "{{ env_var('DATACOVES__AIRBYTE_HOST_NAME') }}"
@@ -37,6 +38,21 @@ generate:
     #     host: "{{ env_var('DATACOVES__AIRBYTE_HOST_NAME') }}"
     #     port: "{{ env_var('DATACOVES__AIRBYTE_PORT') }}"
     #     airbyte_conn_id: airbyte_connection
+
+    #   FivetranDbtGenerator:
+    #     api_key: "{{ env_var('DATACOVES__FIVETRAN_API_KEY') }}"
+    #     api_secret: "{{ env_var('DATACOVES__FIVETRAN_API_SECRET') }}"
+
+    #     dbt_project_path: "{{ env_var('DATACOVES__DBT_HOME') }}"
+    #     run_dbt_compile: false
+    #     run_dbt_deps: false
+
+    #   FivetranGenerator:
+    #     api_key: "{{ env_var('DATACOVES__FIVETRAN_API_KEY') }}"
+    #     api_secret: "{{ env_var('DATACOVES__FIVETRAN_API_SECRET') }}"
+    #     connection_ids:
+    #       - fivetran-connection-id-1
+    #       - fivetran-connection-id-2
 
 # UNCOMMENT THE FOLLOWING LINES TO ENABLE AIRBYTE EXTRACTION
 # extract:
