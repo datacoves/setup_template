@@ -3,6 +3,7 @@ _exclude:
   - .github/
   - ci_requirements.txt
   - test_load_dagbag.py
+  - copier.yml
 
 ci_provider:
   type: str
