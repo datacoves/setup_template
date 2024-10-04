@@ -5,3 +5,5 @@ use_dbt_checkpoint: true
 use_sqlfluff: true
 use_yamllint: true
 yml_dags_path: orchestrate/dag_yml_definitions
+setup_dbtcoves_config: true
+setup_dbtcoves_templates: true

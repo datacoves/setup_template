@@ -43,6 +43,24 @@ use_yamllint:
   when: "{{setup_precommit}}"
   help: use Yamllint?
 
+add_dbtcoves_config_and_templates:
+  type: bool
+  default: false
+  when: "{{not setup_dbt_coves and setup_dbt_project}}"
+  help: Add dbt-coves config and templates?
+
+setup_dbtcoves_config:
+  type: bool
+  default: false
+  when: "{{setup_dbt_coves}}"
+  help: Setup dbt-coves config?
+
+setup_dbtcoves_templates:
+  type: bool
+  default: false
+  when: "{{setup_dbt_coves}}"
+  help: Setup dbt-coves templates?
+
 dbt_adapter:
   type: str
   choices:
