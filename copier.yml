@@ -2,8 +2,13 @@ _exclude:
   - copier-answers.yml
   - ci_requirements.txt
   - test_load_dagbag.py
+  - copier.yaml
   - copier.yml
   - .git
+  - .github/workflows/main.yml
+  - "*.py[co]"
+  - __pycache__
+  - .DS_Store
 
 ci_provider:
   type: str
