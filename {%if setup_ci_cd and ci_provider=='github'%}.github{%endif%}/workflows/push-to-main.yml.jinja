@@ -30,13 +30,13 @@ jobs:
     # https://github.com/<org>/<repo>/settings/environments
     # environment: PR_ENV
     {% if 'snowflake' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-snowflake:2.2
+    container: datacoves/ci-basic-dbt-snowflake:3.2
     {% elif 'redshift' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-redshift:2.2
+    container: datacoves/ci-basic-dbt-redshift:3.2
     {% elif 'databricks' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-databricks:2.2
+    container: datacoves/ci-basic-dbt-databricks:3.2
     {% elif 'bigquery' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-bigquery:2.2
+    container: datacoves/ci-basic-dbt-bigquery:3.2
     {% endif %}
     defaults:
       run:
