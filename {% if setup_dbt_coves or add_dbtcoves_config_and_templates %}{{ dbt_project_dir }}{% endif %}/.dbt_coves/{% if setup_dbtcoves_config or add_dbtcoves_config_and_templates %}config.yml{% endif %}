@@ -55,7 +55,7 @@ generate:
     #       - fivetran-connection-id-2
 
 # UNCOMMENT THE FOLLOWING LINES TO ENABLE AIRBYTE EXTRACTION
-extract:
+# extract:
 #   airbyte:
 #     path: /config/workspace/load/airbyte
 #     host: "{{ env_var('DATACOVES__AIRBYTE_HOST_NAME') }}"

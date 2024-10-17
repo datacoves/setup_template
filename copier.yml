@@ -1,6 +1,5 @@
 _exclude:
   - copier-answers.yml
-  - .github
   - ci_requirements.txt
   - test_load_dagbag.py
   - copier.yml
