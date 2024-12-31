@@ -27,7 +27,7 @@ repos:
         additional_dependencies:
           [
             sqlfluff-templater-dbt=={{sqlfluff_version}},
-            dbt-redshift=={{dbt_adapter_version}},
+            {% if 'snowflake' in dbt_adapter %}dbt-snowflake=={{dbt_adapter_version}},{% elif 'redshift' in dbt_adapter %}dbt-redshift=={{dbt_adapter_version}},{% elif 'databricks' in dbt_adapter %}dbt-databricks=={{dbt_adapter_version}},{% elif 'bigquery' in dbt_adapter %}dbt-bigquery=={{dbt_adapter_version}},{% endif %}
             dbt-core=={{dbt_core_version}},
           ]
         args: [--config, "{{ dbt_project_dir }}/.sqlfluff"]
