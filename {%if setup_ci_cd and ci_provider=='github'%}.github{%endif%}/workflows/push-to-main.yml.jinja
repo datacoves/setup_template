@@ -30,13 +30,13 @@ jobs:
     # https://github.com/<org>/<repo>/settings/environments
     # environment: PR_ENV
     {% if 'snowflake' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-snowflake:3.2
+    container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
     {% elif 'redshift' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-redshift:3.2
+    container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
     {% elif 'databricks' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-databricks:3.2
+    container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
     {% elif 'bigquery' in dbt_adapter %}
-    container: datacoves/ci-basic-dbt-bigquery:3.2
+    container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
     {% endif %}
     defaults:
       run:
@@ -75,7 +75,7 @@ jobs:
 
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           {% raw %}ref: ${{ github.event.push.head.sha }}{% endraw%}
           fetch-depth: 0

@@ -3,7 +3,7 @@ files: ^{{ dbt_project_dir }}/models/
 repos:
 {% if use_dbt_checkpoint %}
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v2.0.1
+    rev: {{dbt_checkpoint_version}}
 
     hooks:
       - id: check-source-table-has-description
@@ -17,7 +17,7 @@ repos:
 {% if use_sqlfluff %}
   - repo: https://github.com/sqlfluff/sqlfluff
     # this is the version of sqlfluff, needs to be updated when using a new sqlfluff version (pip show sqlfluff)
-    rev: 2.3.2
+    rev: {{sqlfluff_version}}
     hooks:
       - id: sqlfluff-lint
         language: python
@@ -25,17 +25,16 @@ repos:
         #   sqlfluff-templater-dbt should match the version of sqlfluff above in rev (pip show sqlfluff-templater-dbt)
         #   dbt-snowflake needs to match the version in transform tab of Datacoves (pip show dbt-snowflake)
         additional_dependencies:
-          # ["sqlfluff-templater-dbt==2.3.2", "dbt-snowflake==1.6.8", dbt-core==1.6.9]
           [
-            "sqlfluff-templater-dbt==2.3.2",
-            "dbt-redshift==1.6.7",
-            dbt-core==1.6.9,
+            sqlfluff-templater-dbt=={{sqlfluff_version}},
+            {% if 'snowflake' in dbt_adapter %}dbt-snowflake=={{dbt_adapter_version}},{% elif 'redshift' in dbt_adapter %}dbt-redshift=={{dbt_adapter_version}},{% elif 'databricks' in dbt_adapter %}dbt-databricks=={{dbt_adapter_version}},{% elif 'bigquery' in dbt_adapter %}dbt-bigquery=={{dbt_adapter_version}},{% endif %}
+            dbt-core=={{dbt_core_version}},
           ]
         args: [--config, "{{ dbt_project_dir }}/.sqlfluff"]
 {% endif %}
 {% if use_yamllint %}
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.17.0
+    rev: {{yamllint_version}}
     hooks:
       - id: yamllint
         args: [-c=.yamllint]

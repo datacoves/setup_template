@@ -75,5 +75,5 @@ dbt_adapter:
     - redshift
     - databricks
   help: What dbt adapter are you using?
-  when: "{{not dbt_adapter and (setup_dbt_profile or setup_ci_cd or setup_sqlfluff)}}"
+  when: "{{not datacoves_dbt_adapter and (setup_dbt_profile or setup_ci_cd or setup_sqlfluff)}}"
   default: snowflake
