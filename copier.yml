@@ -77,3 +77,13 @@ dbt_adapter:
   help: What dbt adapter are you using?
   when: "{{not datacoves_dbt_adapter and (setup_dbt_profile or setup_ci_cd or setup_sqlfluff)}}"
   default: snowflake
+
+dbt_checkpoint_version:
+  type: str
+  help: What dbt-checkpoint version are you using?
+  when: "{{use_dbt_checkpoint and ask_dbt_checkpoint_version}}"
+
+yamllint_version:
+  type: str
+  help: What yamllint version are you using?
+  when: "{{use_yamllint and ask_yamllint_version}}"
