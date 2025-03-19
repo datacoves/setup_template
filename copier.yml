@@ -1,5 +1,7 @@
+_tasks:
+  - echo 'Hello template'
+
 _exclude:
-  - copier-answers.yml
   - ci_requirements.txt
   - test_load_dagbag.py
   - copier.yaml
@@ -10,61 +12,84 @@ _exclude:
   - __pycache__
   - .DS_Store
 
+services:
+  type: str
+  multiselect: true
+  choices:
+    - Base dbt project
+    - dbt profile for automated runs
+    - Initial CI-CD scripts
+    - Linting with SQLFluff, dbt-checkpoint and-or YMLLint
+    - Sample Airflow DAGs
+    - dbt-coves config and-or templates
+  help: What services do you want to setup?
+
+dbt_project_dir:
+  type: str
+  when: "{{'Base dbt project' in services}}"
+  default: "{{ datacoves_env.get('DATACOVES__DBT_HOME', '.') }}"
+  help: dbt project directory
+
+dbt_project_name:
+  type: str
+  when: "{{'Base dbt project' in services}}"
+  help: What is the name of the dbt project?
+
 ci_provider:
   type: str
   choices:
     - github
     - gitlab
-  when: "{{setup_ci_cd}}"
+  when: "{{'Initial CI-CD scripts' in services}}"
   default: github
   help: CI/CD provider
 
 dags_path:
   type: str
-  when: "{{airflow_dags_confirm_path}}"
+  when: "{{'Sample Airflow DAGs' in services and airflow_dags_confirm_path}}"
   default: "{{tentative_dags_path}}"
   help: Airflow DAGs path
 
 yml_dags_path:
   type: str
-  when: "{{yml_dags_confirm_path}}"
+  when: "{{'Sample Airflow DAGs' in services and yml_dags_confirm_path}}"
   default: "{{tentative_yml_dags_path}}"
   help: Airflow YML Dags path
 
 use_dbt_checkpoint:
   type: bool
   default: false
-  when: "{{setup_precommit}}"
+  when: "{{'Linting with SQLFluff, dbt-checkpoint and-or YMLLint' in services}}"
   help: use dbt-checkpoint?
 
 use_sqlfluff:
   type: bool
   default: false
-  when: "{{setup_precommit}}"
+  when: "{{'Linting with SQLFluff, dbt-checkpoint and-or YMLLint' in services}}"
   help: use Sqlfluff?
 
 use_yamllint:
   type: bool
   default: false
-  when: "{{setup_precommit}}"
+  when: "{{'Linting with SQLFluff, dbt-checkpoint and-or YMLLint' in services}}"
   help: use Yamllint?
 
 add_dbtcoves_config_and_templates:
   type: bool
   default: false
-  when: "{{not setup_dbt_coves and setup_dbt_project}}"
+  when: "{{not 'dbt-coves config and-or templates' in services and 'Base dbt project' in services}}"
   help: Add dbt-coves config and templates?
 
 setup_dbtcoves_config:
   type: bool
   default: true
-  when: "{{setup_dbt_coves}}"
+  when: "{{'dbt-coves config and-or templates' in services}}"
   help: Setup dbt-coves config?
 
 setup_dbtcoves_templates:
   type: bool
   default: true
-  when: "{{setup_dbt_coves}}"
+  when: "{{'dbt-coves config and-or templates' in services}}"
   help: Setup dbt-coves templates?
 
 dbt_adapter:
@@ -75,7 +100,7 @@ dbt_adapter:
     - redshift
     - databricks
   help: What dbt adapter are you using?
-  when: "{{not datacoves_dbt_adapter and (setup_dbt_profile or setup_ci_cd or setup_sqlfluff)}}"
+  when: "{{not datacoves_dbt_adapter and ('dbt profile for automated runs' in services or setup_ci_cd or setup_sqlfluff)}}"
   default: snowflake
 
 dbt_checkpoint_version:
