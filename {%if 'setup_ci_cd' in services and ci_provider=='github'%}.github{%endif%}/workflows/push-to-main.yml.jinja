@@ -43,7 +43,7 @@ jobs:
         {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_project_dir}}
 
     env:
-      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{airflow_profile_path}}
+      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_profiles_path}}
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_project_dir}}
 
       {% if 'snowflake' in dbt_adapter %}
