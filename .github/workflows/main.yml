@@ -42,6 +42,7 @@ jobs:
       - name: Run Copier
         run: |
           copier --defaults \
+            -d services="['setup_dbt_project', 'setup_dbt_profile', 'setup_ci_cd', 'setup_precommit', 'setup_airflow_dags', 'setup_dbtcoves']" \
             -d setup_dbt_project=True \
             -d setup_dbt_profile=True \
             -d setup_ci_cd=True \
