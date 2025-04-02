@@ -41,11 +41,3 @@ repos:
         exclude: ^{{ dbt_project_dir }}/.dbt_coves/templates
 
 {% endif %}
-{% if use_newstuff %}
-  - repo: https://github.com/datacoves/some_new_library.git
-    rev: {{newstuff_version}}
-    hooks:
-      - id: yamllint
-        args: [-c=.yamllint]
-        exclude: ^{{ dbt_project_dir }}/.dbt_coves/templates
-{% endif %}

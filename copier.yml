@@ -116,12 +116,6 @@ use_yamllint:
   when: "{{'setup_precommit' in services}}"
   help: use Yamllint?
 
-use_newstuff:
-  type: bool
-  default: false
-  when: "{{'setup_precommit' in services}}"
-  help: use new stuff?
-
 dbt_checkpoint_version:
   type: str
   help: What dbt-checkpoint version are you using?
@@ -139,12 +133,6 @@ sqlfluff_version:
   help: What sqlfluff version are you using?
   default: "{{ datacoves_env.get('DATACOVES__SQLFLUFF_VERSION', '3.1.1') }}"
   when: "{{use_sqlfluff}}"
-
-newstuff_version:
-  type: str
-  help: What new stuff version are you using?
-  default: "{{ datacoves_env.get('DATACOVES__NEWSTUFF_VERSION', '0.0.1') }}"
-  when: "{{use_newstuff}}"
 
 # dbt related vars
 dbt_adapter:
