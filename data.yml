@@ -5,11 +5,6 @@ services:
   - setup_precommit
   - setup_airflow_dags
   - setup_dbtcoves
-setup_dbt_project: true
-setup_dbt_profile: true
-setup_ci_cd: true
-setup_precommit: true
-setup_airflow_dag: true
 dbt_project_dir: "."
 dbt_project_name: "mock_project"
 is_new_project: true
