@@ -19,6 +19,7 @@ dags_path: "orchestrate/dags"
 use_sqlfluff: true
 use_yamllint: true
 use_dbt_checkpoint: true
+ci_provider: "github"
 datacoves_env:
   DATACOVES__AIRFLOW_DBT_PROFILE_PATH: "automate/dbt"
   DATACOVES__DBT_HOME: "."

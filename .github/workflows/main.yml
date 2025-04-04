@@ -40,7 +40,7 @@ jobs:
         run: pip install -r ci_requirements.txt
 
       - name: Run Copier
-        run: copier copy --data-file data.yml -a answers.yml ./ generated/
+        run: copier copy --data-file data.yml ./ generated/
 
       # run dbt debug and dbt compile
       - name: Run dbt commands
