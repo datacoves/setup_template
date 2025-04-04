@@ -1,25 +1,34 @@
 #### Pre-reqs ####
-# Set the correct container based on your data warehouse 
+# Set the correct container based on your data warehouse
 # Add all required environment variables/secrets in Github Actions
+# In the Datacoves environment settings enable the OBSERVE tab to see production docs
+name: Perform deployment to production
 
-name: Test and Check on Pull Request
-
-on:  # yamllint disable-line rule:truthy
+on: # yamllint disable-line rule:truthy
   pull_request:
+    types:
+      - closed
+    branches:
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# This cancels a run if another change is pushed to the same branch
-concurrency:
-  {% raw %}group: ${{ github.workflow }}-${{ github.ref }}{%endraw%}
-  cancel-in-progress: true
-
 jobs:
-  dbt:
-    name: Pull Request dbt Tests
+  # Perform the deployment to Prod
+  build:
+    # Need to make sure that when the PR was closed, it was actually merged.
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+
+    name: Deployment Script
     runs-on: ubuntu-latest
 
+    # Set environment variables in
+    # https://github.com//<your org>/<your repo>/settings/variables/actions
+    #
+    # Alternatively, You can define multiple ENV for different workflows.
+    # https://github.com/<org>/<repo>/settings/environments
+    # environment: PR_ENV
     {% if 'snowflake' in dbt_adapter %}
     container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
     {% elif 'redshift' in dbt_adapter %}
@@ -29,14 +38,13 @@ jobs:
     {% elif 'bigquery' in dbt_adapter %}
     container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
     {% endif %}
-
     defaults:
       run:
-        {% raw %} working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/{{dbt_project_dir}}
+        {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_project_dir}}
 
     env:
-      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/{{ airflow_profile_path }}
-      {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/{{dbt_project_dir}}
+      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_profiles_path}}
+      {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}/{{dbt_project_dir}}
 
       {% if 'snowflake' in dbt_adapter %}
       {% raw %}DATACOVES__MAIN__ACCOUNT: ${{ vars.DB_ACCOUNT }}
@@ -69,24 +77,23 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
+          {% raw %}ref: ${{ github.event.push.head.sha }}{% endraw%}
           fetch-depth: 0
-          {% raw %}ref: ${{ github.event.pull_request.head.sha }}{% endraw %}
 
       - name: Set Secure Directory
-        {% raw %}run: git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}
-
-      - name: List of files changed
-        {% raw %}run: "git diff origin/${{ github.event.pull_request.base.ref }} HEAD --name-status"{% endraw %}
+        {% raw %}run: git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw%}
 
       - name: Install dbt packages
         run: "dbt deps"
 
-      - name: Run dbt build
-        run: "dbt build --fail-fast"
+      - name: dbt build
+        run: "dbt build"
 
-      - name: Run governance checks
-        {% raw %}run: "pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref HEAD"{% endraw %}
+      - name: Generate dbt documentation
+        run: "dbt docs generate"
 
-      - name: Run governance checks 2
-        {% raw %}run: "pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref HEAD"{% endraw %}
-
+      - name: Deploy docs 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: dbt-docs
+          folder: /target
