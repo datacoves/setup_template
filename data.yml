@@ -25,3 +25,10 @@ datacoves_env:
   DATACOVES__DBT_HOME: "."
   DATACOVES__AIRFLOW_DAGS_PATH: "orchestrate/dags"
   DATACOVES__AIRFLOW_DAGS_YML_PATH: "orchestrate/dags_yml_definitions"
+airflow_artifacts_path: "orchestrate"
+setup_dbtcoves_config: true
+setup_dbtcoves_templates: true
+dbt_checkpoint_version: v2.0.6
+yamllint_version: "1.36.2"
+sqlfluff_version: "3.1.1"
+dbt_adapter: "snowflake"
