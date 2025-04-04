@@ -32,3 +32,4 @@ dbt_checkpoint_version: v2.0.6
 yamllint_version: "1.36.2"
 sqlfluff_version: "3.1.1"
 dbt_adapter: "snowflake"
+add_dbtcoves_config_and_templates: true
