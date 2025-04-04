@@ -127,7 +127,7 @@ dbt_checkpoint_version:
 yamllint_version:
   type: str
   help: What yamllint version are you using?
-  default: "{{ datacoves_env.get('DATACOVES__YAMLLINT_VERSION', '1.36.2') }}"
+  default: "{{ datacoves_env.get('DATACOVES__YAMLLINT_VERSION', 'v1.36.2') }}"
   when: "{{use_yamllint}}"
 
 sqlfluff_version:

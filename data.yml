@@ -24,7 +24,7 @@ airflow_artifacts_path: "orchestrate"
 setup_dbtcoves_config: true
 setup_dbtcoves_templates: true
 dbt_checkpoint_version: v2.0.6
-yamllint_version: "1.36.2"
+yamllint_version: "v1.36.2"
 sqlfluff_version: "3.1.1"
 dbt_adapter: "snowflake"
 add_dbtcoves_config_and_templates: true
