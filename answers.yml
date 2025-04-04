@@ -1,0 +1,4 @@
+airflow_artifacts_path: "orchestrate"
+setup_dbtcoves_config: true
+setup_dbtcoves_templates: true
+ci_provider: "github"

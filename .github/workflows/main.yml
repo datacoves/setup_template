@@ -40,26 +40,7 @@ jobs:
         run: pip install -r ci_requirements.txt
 
       - name: Run Copier
-        run: |
-          copier --defaults \
-            -d services="['setup_dbt_project', 'setup_dbt_profile', 'setup_ci_cd', 'setup_precommit', 'setup_airflow_dags', 'setup_dbtcoves']" \
-            -d setup_dbt_project=True \
-            -d setup_dbt_profile=True \
-            -d setup_ci_cd=True \
-            -d setup_precommit=True \
-            -d setup_airflow_dag=True \
-            -d dbt_project_dir="." \
-            -d dbt_project_name="balboa" \
-            -d is_new_project=True \
-            -d dbt_profiles_path="automate/dbt" \
-            -d yml_dags_path="orchestrate/dag_yml_definitions" \
-            -d dags_path="orchestrate/dags" \
-            -d setup_precommit=True \
-            -d use_sqlfluff=True \
-            -d use_yamllint=True \
-            -d use_dbt_checkpoint=True \
-            -d datacoves_env="{ 'DATACOVES__AIRFLOW_DBT_PROFILE_PATH': 'automate/dbt', 'DATACOVES__DBT_HOME': '.', 'DATACOVES__AIRFLOW_DAGS_PATH': 'orchestrate/dags', 'DATACOVES__AIRFLOW_DAGS_YML_PATH': 'orchestrate/dags_yml_definitions' }" \
-            -a ../copier-answers.yml copy ./ generated/
+        run: copier copy --data-file data.yml ./ generated/
 
       # run dbt debug and dbt compile
       - name: Run dbt commands

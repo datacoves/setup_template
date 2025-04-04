@@ -1,0 +1,26 @@
+services:
+  - setup_dbt_project
+  - setup_dbt_profile
+  - setup_ci_cd
+  - setup_precommit
+  - setup_airflow_dags
+  - setup_dbtcoves
+setup_dbt_project: true
+setup_dbt_profile: true
+setup_ci_cd: true
+setup_precommit: true
+setup_airflow_dag: true
+dbt_project_dir: "."
+dbt_project_name: "mock_project"
+is_new_project: true
+dbt_profiles_path: "automate/dbt"
+yml_dags_path: "orchestrate/dag_yml_definitions"
+dags_path: "orchestrate/dags"
+use_sqlfluff: true
+use_yamllint: true
+use_dbt_checkpoint: true
+datacoves_env:
+  DATACOVES__AIRFLOW_DBT_PROFILE_PATH: "automate/dbt"
+  DATACOVES__DBT_HOME: "."
+  DATACOVES__AIRFLOW_DAGS_PATH: "orchestrate/dags"
+  DATACOVES__AIRFLOW_DAGS_YML_PATH: "orchestrate/dags_yml_definitions"
