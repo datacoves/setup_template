@@ -28,3 +28,5 @@ yamllint_version: "v1.36.2"
 sqlfluff_version: "3.1.1"
 dbt_adapter: "snowflake"
 add_dbtcoves_config_and_templates: true
+dbt_core_version: "1.8.9"
+dbt_adapter_version: "1.8.4"
