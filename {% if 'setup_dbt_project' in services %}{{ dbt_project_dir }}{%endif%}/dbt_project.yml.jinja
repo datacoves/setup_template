@@ -1,7 +1,4 @@
-# Name your project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
-name: {{dbt_project_name}} # Change this to your project name
+name: {{dbt_project_name}}
 version: "1.0.0"
 config-version: 2
 
@@ -33,13 +30,54 @@ clean-targets: # directories to be removed by `dbt clean`
 # continue to be built as views. These settings can be overridden in the individual model files
 # using the `{%raw%}{{ config(...) }}{%endraw%}` macro.
 
+seeds:
+    +schema: SEEDS
+    +docs:
+        node_color: "#379965"
+    +quote_columns: false
+    +persist_docs:
+        relation: true
+        columns: true
+
+snapshots:
+    {{dbt_project_name}}:
+        +target_schema: L1_staging
+    +docs:
+        node_color: "#0f703d"
+
 models:
-  datacoves_starter_project:
+  {{dbt_project_name}}:
+    +materialized: view
+    +schema: Z_SCHEMA_NOT_CONFIGURED
+    +persist_docs:
+        relation: true
+        columns: true
+
     L1_staging:
       +materialized: view
+
     L2_core:
       +materialized: view
+      +docs:
+        node_color: "#000899"
+
     L3_marts:
       +materialized: table
-    L4_test:
-      +materialized: table
+      +docs:
+          node_color: "#366ccf"
+
+    {% if 'snowflake' in dbt_adapter %}
+    # Snowflake Defaults
+    +transient: {% raw %}"{{ 'false' if target.name == 'prd' else 'true' }}" {% endraw %}
+    copy_grants: true
+    {% endif %}
+
+{% if store_dbt_tests %}
+data_tests:
+    +store_failures: true
+    +schema: {{ dbt_test_audit_schema }}
+    +store_failures_as: view
+{% endif %}
+
+vars:
+    'dbt_date:time_zone': {{ dbt_time_zone }}

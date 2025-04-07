@@ -1,18 +1,17 @@
 _tasks:
-  - echo 'Hello template'
+  - command: "git init"
+    when: "{{'setup_dbt_project' in services}} and {{ _copier_operation == 'copy' }}"
   # - command: ["git init"]
-  # only run on project setup
-  # when: "{{ _copier_operation == 'copy' }}"
+
 
 _message_before_copy: |
-  Thanks for generating a project using our template.
+  Generating artifacts using our the Datacoves template.
 
 _message_after_copy: |
   Your project "{{ dbt_project_name }}" has been created successfully!
 
 _message_after_update: |
   Your project "{{ dbt_project_name }}" has been updated successfully!
-  In case there
 
 _exclude:
   - ci_requirements.txt
@@ -30,26 +29,46 @@ _exclude:
 services:
   type: str
   multiselect: true
-  help: What services do you want to setup?
+  help: Select what you want to set up?
   choices:
     Base dbt project: setup_dbt_project
-    dbt profile for automated runs: setup_dbt_profile
-    setup_ci_cd: setup_ci_cd
-    Linting with SQLFluff, dbt-checkpoint and-or YMLLint: setup_precommit
-    Sample Airflow DAGs: setup_airflow_dags
-    dbt-coves config and-or templates: setup_dbtcoves
+    dbt profile for ci runs: setup_dbt_profile
+    Set up CI/CD scripts: setup_ci_cd
+    Set up governance with SQLFluff, dbt-checkpoint, and YMLLint: setup_precommit
+    Create sample Airflow DAGs: setup_airflow_dags
+    Create dbt-coves config and templates: setup_dbtcoves
 
 # dbt project related vars
 dbt_project_dir:
   type: str
-  when: "{{'setup_dbt_project' in services}}"
-  default: "{{ datacoves_env.get('DATACOVES__DBT_HOME', '.') }}"
-  help: dbt project directory
+  when: "{{'setup_dbt_project' in services or 'setup_ci_cd' in services }}"
+
+  default: "{{ datacoves_env.get('DATACOVES__DBT_HOME_REL_PATH', '.') }}"
+  help: Enter the dbt project directory
 
 dbt_project_name:
   type: str
   when: "{{'setup_dbt_project' in services}}"
-  help: What is the name of the dbt project?
+  help: Enter a name for your dbt project?
+
+store_dbt_tests:
+  type: bool
+  default: false
+  when: "{{'setup_dbt_project' in services}}"
+  help: Do you want to store dbt test failures?
+
+dbt_test_audit_schema:
+  type: str
+  when: "{{ store_dbt_tests }}"
+  help: Enter a for the schema to store dbt test audit results
+  default: "DBT_TEST__AUDIT"
+
+dbt_time_zone:
+  type: str
+  when: "{{'setup_dbt_project' in services}}"
+  help: Enter the time zone for your project
+  default: 'America/Los_Angeles'
+
 
 # Airflow related vars
 dags_path:
@@ -144,7 +163,7 @@ dbt_adapter:
     - bigquery
     - redshift
     - databricks
-  help: What dbt adapter are you using?
+  help: Which dbt adapter are you using?
   when: "{{not datacoves_dbt_adapter and ('setup_dbt_profile' in services or setup_ci_cd or setup_sqlfluff)}}"
   default: "{{ datacoves_env.get('DATACOVES__DBT_ADAPTER', 'snowflake') }}"
 
@@ -153,3 +172,9 @@ dbt_profiles_path:
   when: "{{ 'setup_dbt_profile' in services or 'setup_ci_cd' in services }}"
   default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DBT_PROFILE_PATH', 'automate/dbt') }}"
   help: dbt Profile Path for automated runs
+
+automated_scripts_path:
+  type: str
+  when: "{{ 'setup_ci_cd' in services }}"
+  default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DBT_PROFILE_PATH', 'automate/').split('/')[0] }}"
+  help: Path for automated scripts
