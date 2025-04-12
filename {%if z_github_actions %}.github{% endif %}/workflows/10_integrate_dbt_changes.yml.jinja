@@ -1,0 +1,144 @@
+name: 🔄 dbt Validations & Governance Checks"
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    paths:
+      - {{ dbt_project_dir }}/*
+      - {{ dbt_project_dir }}/**/*
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# This cancels a run if another change is pushed to the same branch
+concurrency:
+  {% raw %}group: transform-${{ github.ref }}{%endraw%}
+  cancel-in-progress: true
+
+
+jobs:
+  dbt:
+    name: Pull Request dbt Tests
+    runs-on: ubuntu-latest
+    {% if 'snowflake' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
+    {% elif 'redshift' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
+    {% elif 'databricks' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
+    {% elif 'bigquery' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
+    {% endif %}
+
+    # Set environment variables in
+    # https://github.com//<your org>/<your repo>/settings/variables/actions
+    #
+    # Alternatively, You can define multiple ENV for different workflows.
+    # https://github.com/<org>/<repo>/settings/environments
+    # environment: PR_ENV
+
+
+    defaults:
+      run:
+        {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/{% endraw %}{{ dbt_project_dir }}
+
+    env:
+      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_profiles_path }}
+      {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
+
+      {% if 'snowflake' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__ACCOUNT: ${{ vars.DB_ACCOUNT }}
+      DATACOVES__PROD__DATABASE: ${{ vars.PROD_DATABASE }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
+      DATACOVES__MAIN__ROLE: ${{ vars.DB_ROLE }}
+      DATACOVES__MAIN__WAREHOUSE: ${{ vars.DB_WAREHOUSE }}
+      DATACOVES__MAIN__USER: ${{ vars.DB_USER }}
+      DATACOVES__MAIN__PASSWORD: ${{ secrets.DB_PASSWORD }}
+      {% endraw %}
+      {% elif 'redshift' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
+      DATACOVES__MAIN__USER: ${{ vars.DB_USER }}
+      DATACOVES__MAIN__PASSWORD: ${{ vars.DB_PASSWORD }}
+      DATACOVES__MAIN__DATABASE: ${{ vars.PROD_DATABASE }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
+      DATACOVES__MAIN__PORT: ${{ vars.DB_PORT }}
+      {% endraw %}
+      {% elif 'databricks' in dbt_adapter %}
+      {%raw %}
+      DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
+      DATACOVES__MAIN__HTTP_PATH: ${{ vars.DB_HTTP_PATH }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
+      DATACOVES__MAIN__TOKEN: ${{ vars.DB_TOKEN }}
+      {% endraw %}
+      {% elif 'bigquery' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__KEYFILE_JSON: ${{ vars.DB_KEYFILE_JSON }}
+      DATACOVES__MAIN__PROJECT: ${{ vars.DB_PROJECT }}
+      {% endraw %}
+      {% endif %}
+
+      # This is used by datacoves to drop the test database if permissions
+      # cannot be applied when using the Datacoves permifrost security model.
+      {% raw %}DATACOVES__DROP_DB_ON_FAIL:  ${{ vars.DATACOVES__DROP_DB_ON_FAIL }}{% endraw %}
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3.5.0
+        with:
+          fetch-depth: 0
+          {% raw %}ref: ${{ github.event.pull_request.head.sha }}{% endraw %}
+
+      - name: Set Secure Directory
+        {% raw %}run: git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}
+
+      - name: List of files changed
+        {% raw %}run: "git diff origin/${{ github.event.pull_request.base.ref }} HEAD --name-status"{% endraw %}
+
+      - name: Install dbt packages
+        run: "dbt deps"
+
+      - name: Create PR database
+        run: "dbt --no-write-json run-operation create_database"
+
+      - name: Get prod manifest
+        id: prod_manifest
+        run: "../automate/dbt/get_artifacts.sh"
+
+      ##### Governance Checks
+      # this first runs dbt but creates enpty tables, this is enough to then run the hooks and fail fast
+
+      - name: Governance run of dbt with EMPTY models using slim mode
+        {% raw %}if: ${{ steps.prod_manifest.outputs.manifest_found == 'true' && contains(github.event.pull_request.labels.*.name, 'full-refresh') != true }}{% endraw %}
+        run: "dbt build --fail-fast --defer --state logs --select state:modified+ --empty"
+
+      - name: Governance run of dbt with EMPTY models using full run
+        {% raw %}if: ${{ steps.prod_manifest.outputs.manifest_found == 'false' || contains(github.event.pull_request.labels.*.name, 'full-refresh') }}{% endraw %}
+        run: "dbt build --fail-fast --empty"
+
+      - name: Generate Docs Combining Prod and branch catalog.json
+        run: "dbt-coves generate docs --merge-deferred --state logs"
+
+      - name: Run governance checks
+        {% raw %}run: "pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref HEAD"{% endraw %}
+
+      ##### Real dbt run given that we passed governance checks
+      - name: Run dbt build slim mode
+        {% raw %}if: ${{ steps.prod_manifest.outputs.manifest_found == 'true' && contains(github.event.pull_request.labels.*.name, 'full-refresh') != true }}{% endraw %}
+        run: "dbt build --fail-fast --defer --state logs --select state:modified+"
+
+      - name: Run dbt build full run
+        {% raw %}if: ${{ steps.prod_manifest.outputs.manifest_found == 'false' || contains(github.event.pull_request.labels.*.name, 'full-refresh') }}{% endraw %}
+        run: "dbt build --fail-fast"
+
+      - name: Grant access to PR database
+        id: grant-access-to-database
+        run: "dbt --no-write-json run-operation grant_access_to_pr_database"
+
+      # We drop the database when there is a failure to grant access to the db because
+      # most likely the schema was not set properly in dbt_project.yml so models built to default schema
+      - name: Drop PR database on Failure to grant security access
+        {% raw %}
+        if: always() && (env.DATACOVES__DROP_DB_ON_FAIL == 'true') && (steps.grant-access-to-database.outcome == 'failure')
+        run: "dbt --no-write-json run-operation drop_recreate_db --args '{db_name: ${{env.DATACOVES__MAIN__DATABASE}}, recreate: False}'"  # yamllint disable-line rule:line-length
+        {% endraw %}

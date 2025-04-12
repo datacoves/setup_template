@@ -1,8 +1,11 @@
 _tasks:
-  - command: "git init"
-    when: "{{'setup_dbt_project' in services}} and {{ _copier_operation == 'copy' }}"
-  # - command: ["git init"]
+  - command: "git init -b main"
+#   - command: "echo HELLO THERE"
+    when: "'setup_dbt_project' in services and _copier_operation == 'copy'"
 
+  # - command: "echo Current operation: {{ _copier_operation }}, Services selected: {{ services }}"
+  # - command: "echo HELLO THERE"
+  #   when: "('setup_dbt_project' in services) and (_copier_operation == 'copy')"
 
 _message_before_copy: |
   Generating artifacts using our the Datacoves template.
@@ -25,30 +28,34 @@ _exclude:
   - .DS_Store
   - data.yml
   - answers.yml
+  - dbtsetup.sh
 
+
+# Main Menu
 services:
   type: str
   multiselect: true
   help: Select what you want to set up?
   choices:
     Base dbt project: setup_dbt_project
+    Add dbt helper macros: add_dbt_helper_macros
     dbt profile for ci runs: setup_dbt_profile
     Set up CI/CD scripts: setup_ci_cd
     Set up governance with SQLFluff, dbt-checkpoint, and YMLLint: setup_precommit
     Create sample Airflow DAGs: setup_airflow_dags
     Create dbt-coves config and templates: setup_dbtcoves
 
+
 # dbt project related vars
 dbt_project_dir:
   type: str
-  when: "{{'setup_dbt_project' in services or 'setup_ci_cd' in services }}"
-
+  when: "{{'setup_dbt_project' in services or 'setup_ci_cd' in services or 'add_dbt_helper_macros' in services }}"
   default: "{{ datacoves_env.get('DATACOVES__DBT_HOME_REL_PATH', '.') }}"
   help: Enter the dbt project directory
 
 dbt_project_name:
   type: str
-  when: "{{'setup_dbt_project' in services}}"
+  when: "{{'setup_dbt_project' in services or 'add_dbt_helper_macros' in services }}"
   help: Enter a name for your dbt project?
 
 store_dbt_tests:
@@ -68,6 +75,14 @@ dbt_time_zone:
   when: "{{'setup_dbt_project' in services}}"
   help: Enter the time zone for your project
   default: 'America/Los_Angeles'
+  choices:
+    - America/New_York
+    - America/Chicago
+    - America/Denver
+    - America/Phoenix
+    - America/Los_Angeles
+    - Europe/London
+    - Europe/Berlin
 
 
 # Airflow related vars
@@ -83,13 +98,20 @@ airflow_artifacts_path:
   default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags').split('/')[0] }}"
   help: Airflow Artifacts path for unit tests
 
+airflow_utils_path:
+  type: str
+  when: "{{'setup_airflow_dags' in services or 'setup_ci_cd' in services}}"
+  default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags').split('/')[0] }}/utils"
+  help: Airflow utils path
+
 yml_dags_path:
   type: str
   when: "{{'setup_airflow_dags' in services and yml_dags_confirm_path}}"
   default: "{{datacoves_env.get('DATACOVES__AIRFLOW_DAGS_YML_PATH', 'orchestrate/dags_yml_definitions')}}"
   help: Airflow YML Dags path
 
-# dbt-coves related vars
+
+# dbt-coves generate related vars
 add_dbtcoves_config_and_templates:
   type: bool
   default: false
@@ -108,8 +130,8 @@ setup_dbtcoves_templates:
   when: "{{'setup_dbtcoves' in services}}"
   help: Setup dbt-coves templates?
 
-# CI / CD Related vars
 
+# CI / CD Related vars
 ci_provider:
   type: str
   choices:
@@ -155,6 +177,7 @@ sqlfluff_version:
   default: "{{ datacoves_env.get('DATACOVES__SQLFLUFF_VERSION', '3.1.1') }}"
   when: "{{use_sqlfluff}}"
 
+
 # dbt related vars
 dbt_adapter:
   type: str
@@ -167,6 +190,24 @@ dbt_adapter:
   when: "{{not datacoves_dbt_adapter and ('setup_dbt_profile' in services or setup_ci_cd or setup_sqlfluff)}}"
   default: "{{ datacoves_env.get('DATACOVES__DBT_ADAPTER', 'snowflake') }}"
 
+add_dbt_helper_macros:
+  type: bool
+  default: false
+  when: "{{not 'setup_dbtcoves' in services and 'add_dbt_macros' in services}}"
+  help: Add Datacoves dbt helper macros?
+
+override_dbt_macros:
+  type: bool
+  default: false
+  when: "{{not 'setup_dbtcoves' in services and 'add_dbt_macros' in services}}"
+  help: Override standard dbt macros (ref, generate_schema_name)?
+
+base_database_name:
+  type: str
+  when: "{{ ('setup_dbt_profile' in services or 'setup_ci_cd' in services) and add_dbt_helper_macros }}"
+  default: "analytics"
+  help: Enter the base database name for example, PROD_ANALYTICS would be analytics
+
 dbt_profiles_path:
   type: str
   when: "{{ 'setup_dbt_profile' in services or 'setup_ci_cd' in services }}"
@@ -178,3 +219,30 @@ automated_scripts_path:
   when: "{{ 'setup_ci_cd' in services }}"
   default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DBT_PROFILE_PATH', 'automate/').split('/')[0] }}"
   help: Path for automated scripts
+
+
+# Variables to simplify folder names
+z_dbt_macros:
+  type: bool
+  default: "{{ ('setup_dbt_project' in services) or ('add_dbt_helper_macros' in services) }}"
+  when: false
+
+z_dbt_coves:
+  type: bool
+  default: "{{ 'setup_dbtcoves' in services or add_dbtcoves_config_and_templates }}"
+  when: false
+
+z_github_actions:
+  type: bool
+  default: "{{ 'setup_ci_cd' in services and ci_provider=='github' }}"
+  when: false
+
+z_gitlab_ci:
+  type: bool
+  default: "{{ 'setup_ci_cd' in services and ci_provider=='gitlab' }}"
+  when: false
+
+z_pre_commit:
+  type: bool
+  default: "{{ use_sqlfluff or use_yamllint or use_dbt_checkpoint }}"
+  when: false
