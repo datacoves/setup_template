@@ -28,7 +28,7 @@ _exclude:
   - .DS_Store
   - data.yml
   - answers.yml
-  - dbtsetup.sh
+  - dbt_setup_test.sh
 
 
 # Main Menu
@@ -199,7 +199,7 @@ add_dbt_helper_macros:
 override_dbt_macros:
   type: bool
   default: false
-  when: "{{not 'setup_dbtcoves' in services and 'add_dbt_macros' in services}}"
+  when: "{{'setup_dbt_project' in services or 'add_dbt_helper_macros' in services }}"
   help: Override standard dbt macros (ref, generate_schema_name)?
 
 base_database_name:
