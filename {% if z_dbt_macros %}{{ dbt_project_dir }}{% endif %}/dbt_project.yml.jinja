@@ -20,6 +20,12 @@ clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+# Never quote identifiers
+quoting:
+    database: false
+    schema: false
+    identifier: false
+
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
@@ -27,23 +33,27 @@ clean-targets: # directories to be removed by `dbt clean`
 # dbt run or dbt build, all of your models will be built as a view in your data platform.
 # The configuration below will override this setting for models in the example folder to
 # instead be materialized as tables. Any models you add to the root of the models folder will
-# continue to be built as views. These settings can be overridden in the individual model files
-# using the `{%raw%}{{ config(...) }}{%endraw%}` macro.
+# continue to be built as views.
 
 seeds:
-    +schema: SEEDS
-    +docs:
-        node_color: "#379965"
-    +quote_columns: false
-    +persist_docs:
-        relation: true
-        columns: true
+  +schema: l1_staging__SEEDS
+  +docs:
+      node_color: "#379965"
+  +quote_columns: false
+  +persist_docs:
+      relation: true
+      columns: true
+
+  # Snowflake Defaults
+  +transient: "{{ 'false' if target.name == 'prd' else 'true' }}"
+  copy_grants: true
 
 snapshots:
-    {{dbt_project_name}}:
-        +target_schema: L1_staging
-    +docs:
-        node_color: "#0f703d"
+  {{dbt_project_name}}:
+    +target_schema: L1_staging
+  +docs:
+    node_color: "#0f703d"
+  +query_tag: dbt_snapshots
 
 models:
   {{dbt_project_name}}:
@@ -55,16 +65,23 @@ models:
 
     L1_staging:
       +materialized: view
+      # Staging schema fallback, each source should have it's own l1_staging__<source> schema
+      +schema: l1_staging
+
 
     L2_core:
       +materialized: view
       +docs:
         node_color: "#000899"
+      # Intermediate schema fallback, each folder should have it's own L2_core__<folder> schema
+      +schema: L2_core
 
     L3_marts:
       +materialized: table
       +docs:
           node_color: "#366ccf"
+      # Marts schema fallback, each folder should have it's own l3_marts__<folder> schema
+      +schema: l3_marts
 
     {% if 'snowflake' in dbt_adapter %}
     # Snowflake Defaults

@@ -8,9 +8,13 @@ dbt_packages/
 .config/.user.yml
 /profiles.yml
 /.user.yml
+automate/dbt/.user.yml
 __pycache__
 
 nohup.out
+
+# dlt
+secrets.toml
 
 # Virtual envs
 venv/
