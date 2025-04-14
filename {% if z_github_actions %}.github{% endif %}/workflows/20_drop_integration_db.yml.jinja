@@ -1,0 +1,89 @@
+name: 🗑️ Drop test databases
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    types:
+      - closed
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Drops the temporary PR database
+  drop-pr-db-on-close:
+    name: Drop PR Database on Close
+
+    runs-on: ubuntu-latest
+
+    # Set environment variables in
+    # https://github.com//<your org>/<your repo>/settings/variables/actions
+    #
+    # Alternatively, You can define multiple ENV for different workflows.
+    # https://github.com/<org>/<repo>/settings/environments
+    # environment: PR_ENV
+    {% if 'snowflake' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
+    {% elif 'redshift' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
+    {% elif 'databricks' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
+    {% elif 'bigquery' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
+    {% endif %}
+
+    defaults:
+      run:
+        {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/{% endraw %}{{ dbt_project_dir }}
+
+    env:
+      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_profiles_path }}
+      {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
+
+      {% if 'snowflake' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
+      DATACOVES__PROD__DATABASE: ${{ vars.DATACOVES__PROD__DATABASE }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
+      DATACOVES__MAIN__ROLE: ${{ vars.DATACOVES__MAIN__ROLE }}
+      DATACOVES__MAIN__WAREHOUSE: ${{ vars.DATACOVES__MAIN__WAREHOUSE }}
+      DATACOVES__MAIN__USER: ${{ vars.DATACOVES__MAIN__USER }}
+      DATACOVES__MAIN__PRIVATE_KEY: ${{ secrets.DATACOVES__MAIN__PRIVATE_KEY }}
+      {% endraw %}
+      {% elif 'redshift' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
+      DATACOVES__MAIN__USER: ${{ vars.DB_USER }}
+      DATACOVES__MAIN__PASSWORD: ${{ vars.DB_PASSWORD }}
+      DATACOVES__MAIN__DATABASE: ${{ vars.PROD_DATABASE }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
+      DATACOVES__MAIN__PORT: ${{ vars.DB_PORT }}
+      {% endraw %}
+      {% elif 'databricks' in dbt_adapter %}
+      {%raw %}
+      DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
+      DATACOVES__MAIN__HTTP_PATH: ${{ vars.DB_HTTP_PATH }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
+      DATACOVES__MAIN__TOKEN: ${{ vars.DB_TOKEN }}
+      {% endraw %}
+      {% elif 'bigquery' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__KEYFILE_JSON: ${{ vars.DB_KEYFILE_JSON }}
+      DATACOVES__MAIN__PROJECT: ${{ vars.DB_PROJECT }}
+      {% endraw %}
+      {% endif %}
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3.5.0
+        with:
+          fetch-depth: 0
+          {% raw %}ref: ${{ github.event.pull_request.head.sha }}{% endraw %}
+
+      - name: Set Secure Directory
+        {% raw %}run: git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}
+
+      - name: Install dbt packages
+        run: "dbt deps"
+
+      - name: Drop PR database
+        {% raw %}run: "dbt --no-write-json run-operation drop_recreate_db --args '{db_name: ${{env.DATACOVES__MAIN__DATABASE}}, recreate: False}'"{% endraw %}  # yamllint disable-line rule:line-length

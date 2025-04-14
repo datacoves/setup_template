@@ -4,7 +4,7 @@
 #}
 {# Once this is completed, deferral and state modifiers are available using --state logs #}
 
-{% macro get_last_artifacts(stage = 'RAW.DBT_ARTIFACTS.ARTIFACTS') %}
+{% macro get_last_artifacts(stage = 'PRD_RAW.DBT_ARTIFACTS.ARTIFACTS') %}
     {# we will put the manifest.json in the log directory and use the with the --state param in dbt #}
     {% set logs_dir = env_var('DATACOVES__DBT_HOME') ~ "/logs/" %}
 

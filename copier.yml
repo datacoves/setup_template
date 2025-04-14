@@ -104,6 +104,12 @@ airflow_utils_path:
   default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags').split('/')[0] }}/utils"
   help: Airflow utils path
 
+airflow_tests_path:
+  type: str
+  when: "{{ add_airflow_tests }}"
+  default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags').split('/')[0] }}/test_dags"
+  help: Airflow tests path
+
 yml_dags_path:
   type: str
   when: "{{'setup_airflow_dags' in services and yml_dags_confirm_path}}"
@@ -140,6 +146,12 @@ ci_provider:
   when: "{{'setup_ci_cd' in services}}"
   default: github
   help: CI/CD provider
+
+add_airflow_tests:
+  type: bool
+  default: false
+  when: "{{'setup_ci_cd' in services}}"
+  help: Add CI workflow and helpers for Airflow?
 
 use_dbt_checkpoint:
   type: bool

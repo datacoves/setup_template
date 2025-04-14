@@ -1,0 +1,137 @@
+name: 🚀 Deploy to Production
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/*
+      - {{ automated_scripts_path }}/*
+      - {{ dbt_project_dir }}/*
+      - {{ dbt_project_dir }}/**/*
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  # Perform the deployment to Prod
+  build:
+    name: Deployment Script
+    runs-on: ubuntu-latest
+
+    # Set environment variables in
+    # https://github.com//<your org>/<your repo>/settings/variables/actions
+    #
+    # Alternatively, You can define multiple ENV for different workflows.
+    # https://github.com/<org>/<repo>/settings/environments
+    # environment: PR_ENV
+    {% if 'snowflake' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
+    {% elif 'redshift' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
+    {% elif 'databricks' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
+    {% elif 'bigquery' in dbt_adapter %}
+    container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
+    {% endif %}
+
+    defaults:
+      run:
+        {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/{% endraw %}{{ dbt_project_dir }}
+
+    env:
+      {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_profiles_path }}
+      {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
+
+      {% if 'snowflake' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
+      DATACOVES__PROD__DATABASE: ${{ vars.DATACOVES__PROD__DATABASE }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
+      DATACOVES__MAIN__ROLE: ${{ vars.DATACOVES__MAIN__ROLE }}
+      DATACOVES__MAIN__WAREHOUSE: ${{ vars.DATACOVES__MAIN__WAREHOUSE }}
+      DATACOVES__MAIN__USER: ${{ vars.DATACOVES__MAIN__USER }}
+      DATACOVES__MAIN__PRIVATE_KEY: ${{ secrets.DATACOVES__MAIN__PRIVATE_KEY }}
+      {% endraw %}
+      {% elif 'redshift' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
+      DATACOVES__MAIN__USER: ${{ vars.DB_USER }}
+      DATACOVES__MAIN__PASSWORD: ${{ vars.DB_PASSWORD }}
+      DATACOVES__MAIN__DATABASE: ${{ vars.PROD_DATABASE }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
+      DATACOVES__MAIN__PORT: ${{ vars.DB_PORT }}
+      {% endraw %}
+      {% elif 'databricks' in dbt_adapter %}
+      {%raw %}
+      DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
+      DATACOVES__MAIN__HTTP_PATH: ${{ vars.DB_HTTP_PATH }}
+      DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
+      DATACOVES__MAIN__TOKEN: ${{ vars.DB_TOKEN }}
+      {% endraw %}
+      {% elif 'bigquery' in dbt_adapter %}
+      {% raw %}
+      DATACOVES__MAIN__KEYFILE_JSON: ${{ vars.DB_KEYFILE_JSON }}
+      DATACOVES__MAIN__PROJECT: ${{ vars.DB_PROJECT }}
+      {% endraw %}
+      {% endif %}
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          {% raw %}ref: ${{ github.event.pull_request.head.sha }}{% endraw %}
+
+      - name: Set Secure Directory
+        {% raw %}run: git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}
+
+      - name: Install dbt packages
+        run: "dbt deps"
+
+      - name: Get prod manifest
+        id: prod-manifest
+        run: "../automate/dbt/get_artifacts.sh"
+
+      - name: Run blue / green deployment
+        if: contains(github.event.pull_request.labels.*.name, 'full-refresh') != true
+        id: run-blue-green
+        env:
+          {% raw %}MANIFEST_FOUND: ${{ steps.prod-manifest.outputs.manifest_found }}{% endraw %}
+        run: "dbt-coves blue-green --defer"
+
+      - name: Run blue / green deployment with full-refresh
+        if: contains(github.event.pull_request.labels.*.name, 'full-refresh')
+        id: run-blue-green-full-refresh
+        env:
+          {% raw %}MANIFEST_FOUND: ${{ steps.prod-manifest.outputs.manifest_found }}{% endraw %}
+        run: "dbt-coves blue-green --defer --full-refresh"
+
+      - name: Drop orphaned relations in db that are no longer in dbt
+        {% raw %}run: "dbt run-operation drop_orphaned_relations --args '{\"dry_run\": false}'"{% endraw %}
+
+      - name: Generate dbt documentation
+        run: "dbt docs generate"
+
+      - name: Deploy docs 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: dbt-docs
+          folder: transform/target
+
+      - name: Upload dbt artifacts
+        run: "dbt run-operation upload_artifacts"
+
+      - uses: fregante/setup-git-user@v2
+      - name: Bump dbt project and git project version
+        run: "../automate/dbt/bump_dbt_project.sh"
+
+      - name: Push version changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          tags: true
+          {% raw %}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+          {% endraw %}
