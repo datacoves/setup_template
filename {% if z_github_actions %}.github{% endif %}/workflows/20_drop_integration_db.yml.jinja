@@ -42,7 +42,7 @@ jobs:
       {% if 'snowflake' in dbt_adapter %}
       {% raw %}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
-      DATACOVES__PROD__DATABASE: ${{ vars.DATACOVES__PROD__DATABASE }}
+      DATACOVES__PROD__DATABASE: ${{ vars.DATACOVES__MAIN__DATABASE }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
       DATACOVES__MAIN__ROLE: ${{ vars.DATACOVES__MAIN__ROLE }}
       DATACOVES__MAIN__WAREHOUSE: ${{ vars.DATACOVES__MAIN__WAREHOUSE }}
