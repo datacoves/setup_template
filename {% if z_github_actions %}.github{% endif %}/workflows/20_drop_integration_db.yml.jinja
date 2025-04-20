@@ -40,7 +40,7 @@ jobs:
       {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_profiles_path }}
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
 
-      {%- if 'snowflake' in dbt_adapter -%}
+      {% if 'snowflake' in dbt_adapter %}
       {% raw %}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
       DATACOVES__MAIN__DATABASE: TST_${{ vars.DATACOVES__MAIN__DATABASE }}_PR_${{ github.event.number }}

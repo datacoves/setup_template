@@ -43,7 +43,7 @@ jobs:
       {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_profiles_path }}
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
 
-      {%- if 'snowflake' in dbt_adapter -%}
+      {% if 'snowflake' in dbt_adapter %}
       {% raw %}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
       DATACOVES__MAIN__DATABASE: TST_${{ vars.DATACOVES__MAIN__DATABASE }}_PR_${{ github.event.number }}
@@ -154,6 +154,6 @@ jobs:
       # most likely the schema was not set properly in dbt_project.yml so models built to default schema
       - name: Drop PR database on Failure to grant security access
         {% raw %}
-        if: always() && (env.DATACOVES__DROP_DB_ON_FAIL == 'true') && (steps.grant-access-to-database.outcome == 'failure')
+        if: ${{ failure() && steps.grant-access-to-database.conclusion == 'failure' }}
         run: "dbt --no-write-json run-operation drop_recreate_db --args '{db_name: ${{env.DATACOVES__MAIN__DATABASE}}, recreate: False}'"  # yamllint disable-line rule:line-length
         {% endraw %}
