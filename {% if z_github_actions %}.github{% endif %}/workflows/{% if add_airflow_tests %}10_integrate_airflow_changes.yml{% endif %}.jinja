@@ -39,7 +39,7 @@ jobs:
       {% raw %}
       DATACOVES__REPO_PATH: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
       PYTHONPATH: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
-      {%- endraw -%}
+      {% endraw %}
       FORCE_COLOR: 1
       {% raw %}OUTPUT_FILE: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/test_output.md
 
@@ -74,4 +74,4 @@ jobs:
           {% raw %}
           filePath: ${{ env.OUTPUT_FILE }}
           GITHUB_TOKEN: ${{ github.token }}
-          {%- endraw -%}
+          {% endraw %}

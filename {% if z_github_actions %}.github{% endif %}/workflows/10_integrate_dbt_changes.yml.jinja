@@ -74,7 +74,7 @@ jobs:
       DATACOVES__MAIN__KEYFILE_JSON: ${{ vars.DB_KEYFILE_JSON }}
       DATACOVES__MAIN__PROJECT: ${{ vars.DB_PROJECT }}
       {%- endraw -%}
-      {%- endif -%}
+      {% endif %}
 
       # This is used by datacoves to drop the test database if permissions
       # cannot be applied when using the Datacoves permifrost security model.
