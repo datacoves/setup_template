@@ -14,20 +14,19 @@ concurrency:
   {% raw %}group: transform-${{ github.ref }}{%endraw%}
   cancel-in-progress: true
 
-
 jobs:
   dbt:
     name: Pull Request dbt Tests
     runs-on: ubuntu-latest
-    {% if 'snowflake' in dbt_adapter %}
+    {%- if 'snowflake' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
-    {% elif 'redshift' in dbt_adapter %}
+    {%- elif 'redshift' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
-    {% elif 'databricks' in dbt_adapter %}
+    {%- elif 'databricks' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
-    {% elif 'bigquery' in dbt_adapter %}
+    {%- elif 'bigquery' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
-    {% endif %}
+    {%- endif -%}
 
     # Set environment variables in
     # https://github.com//<your org>/<your repo>/settings/variables/actions
@@ -155,7 +154,7 @@ jobs:
       # We drop the database when there is a failure to grant access to the db because
       # most likely the schema was not set properly in dbt_project.yml so models built to default schema
       - name: Drop PR database on Failure to grant security access
-        {% raw %}
+        {%- raw -%}
         if: always() && (env.DATACOVES__DROP_DB_ON_FAIL == 'true') && (steps.grant-access-to-database.outcome == 'failure')
         run: "dbt --no-write-json run-operation drop_recreate_db --args '{db_name: ${{env.DATACOVES__MAIN__DATABASE}}, recreate: False}'"  # yamllint disable-line rule:line-length
-        {% endraw %}
+        {%- endraw -%}

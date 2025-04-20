@@ -21,25 +21,25 @@ jobs:
   airflow:
     name: Pull Request Airflow Tests
     runs-on: ubuntu-latest
-    {% if 'snowflake' in dbt_adapter %}
+    {%- if 'snowflake' in dbt_adapter -%}
     container: datacoves/ci-airflow-dbt-snowflake:{{datacoves_env_version}}
-    {% elif 'redshift' in dbt_adapter %}
+    {%- elif 'redshift' in dbt_adapter -%}
     container: datacoves/ci-airflow-dbt-redshift:{{datacoves_env_version}}
-    {% elif 'databricks' in dbt_adapter %}
+    {%- elif 'databricks' in dbt_adapter -%}
     container: datacoves/ci-airflow-dbt-databricks:{{datacoves_env_version}}
-    {% elif 'bigquery' in dbt_adapter %}
+    {%- elif 'bigquery' in dbt_adapter -%}
     container: datacoves/ci-airflow-dbt-bigquery:{{datacoves_env_version}}
-    {% endif %}
+    {%- endif -%}
 
     env:
       {% raw %}AIRFLOW__CORE__DAGS_FOLDER: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/{{ dags_path }}
       {% raw %}AIRFLOW__ARTIFACTS_PATH: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/{{ airflow_artifacts_path }}
       AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: 300
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/{{dbt_project_dir}}
-      {% raw %}
+      {%- raw -%}
       DATACOVES__REPO_PATH: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
       PYTHONPATH: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
-      {%endraw%}
+      {%- endraw -%}
       FORCE_COLOR: 1
       {% raw %}OUTPUT_FILE: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/test_output.md
 
@@ -71,7 +71,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: Custom Tests
-          {% raw %}
+          {%- raw -%}
           filePath: ${{ env.OUTPUT_FILE }}
           GITHUB_TOKEN: ${{ github.token }}
-          {% endraw %}
+          {%- endraw -%}

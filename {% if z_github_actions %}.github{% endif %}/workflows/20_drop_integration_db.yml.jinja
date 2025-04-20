@@ -21,15 +21,15 @@ jobs:
     # Alternatively, You can define multiple ENV for different workflows.
     # https://github.com/<org>/<repo>/settings/environments
     # environment: PR_ENV
-    {% if 'snowflake' in dbt_adapter %}
+    {%- if 'snowflake' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
-    {% elif 'redshift' in dbt_adapter %}
+    {%- elif 'redshift' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
-    {% elif 'databricks' in dbt_adapter %}
+    {%- elif 'databricks' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
-    {% elif 'bigquery' in dbt_adapter %}
+    {%- elif 'bigquery' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
-    {% endif %}
+    {%- endif -%}
 
     defaults:
       run:
@@ -39,8 +39,8 @@ jobs:
       {% raw %}DBT_PROFILES_DIR: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_profiles_path }}
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
 
-      {% if 'snowflake' in dbt_adapter %}
-      {% raw %}
+      {%- if 'snowflake' in dbt_adapter -%}
+      {%- raw -%}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
       DATACOVES__MAIN__DATABASE: TST_${{ vars.DATACOVES__MAIN__DATABASE }}_PR_${{ github.event.number }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
@@ -48,29 +48,29 @@ jobs:
       DATACOVES__MAIN__WAREHOUSE: ${{ vars.DATACOVES__MAIN__WAREHOUSE }}
       DATACOVES__MAIN__USER: ${{ vars.DATACOVES__MAIN__USER }}
       DATACOVES__MAIN__PRIVATE_KEY: ${{ secrets.DATACOVES__MAIN__PRIVATE_KEY }}
-      {% endraw %}
-      {% elif 'redshift' in dbt_adapter %}
-      {% raw %}
+      {%- endraw -%}
+      {%- elif 'redshift' in dbt_adapter -%}
+      {%- raw -%}
       DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
       DATACOVES__MAIN__USER: ${{ vars.DB_USER }}
       DATACOVES__MAIN__PASSWORD: ${{ vars.DB_PASSWORD }}
       DATACOVES__MAIN__DATABASE: ${{ vars.PROD_DATABASE }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
       DATACOVES__MAIN__PORT: ${{ vars.DB_PORT }}
-      {% endraw %}
-      {% elif 'databricks' in dbt_adapter %}
-      {%raw %}
+      {%- endraw -%}
+      {%- elif 'databricks' in dbt_adapter -%}
+      {%- raw -%}
       DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
       DATACOVES__MAIN__HTTP_PATH: ${{ vars.DB_HTTP_PATH }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
       DATACOVES__MAIN__TOKEN: ${{ vars.DB_TOKEN }}
-      {% endraw %}
-      {% elif 'bigquery' in dbt_adapter %}
-      {% raw %}
+      {%- endraw -%}
+      {%- elif 'bigquery' in dbt_adapter -%}
+      {%- raw -%}
       DATACOVES__MAIN__KEYFILE_JSON: ${{ vars.DB_KEYFILE_JSON }}
       DATACOVES__MAIN__PROJECT: ${{ vars.DB_PROJECT }}
-      {% endraw %}
-      {% endif %}
+      {%- endraw -%}
+      {%- endif -%}
 
     steps:
       - name: Checkout branch
