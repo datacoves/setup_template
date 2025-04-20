@@ -1,12 +1,14 @@
 name: 🚀 Deploy to Production
 
+permissions: write-all
+
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - main
     paths:
       - .github/workflows/*
-      - {{ automated_scripts_path }}/*
+      - {{ automated_scripts_path }}/**
       - {{ dbt_project_dir }}/*
       - {{ dbt_project_dir }}/**/*
 
@@ -47,7 +49,7 @@ jobs:
       {% if 'snowflake' in dbt_adapter %}
       {% raw %}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
-      DATACOVES__MAIN__DATABASE: ${{ vars.DATACOVES__MAIN__DATABASE }}
+      DATACOVES__MAIN__DATABASE: PRD_${{ vars.DATACOVES__MAIN__DATABASE }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
       DATACOVES__MAIN__ROLE: ${{ vars.DATACOVES__MAIN__ROLE }}
       DATACOVES__MAIN__WAREHOUSE: ${{ vars.DATACOVES__MAIN__WAREHOUSE }}
@@ -99,14 +101,14 @@ jobs:
         id: run-blue-green
         env:
           {% raw %}MANIFEST_FOUND: ${{ steps.prod-manifest.outputs.manifest_found }}{% endraw %}
-        run: "dbt-coves blue-green --defer"
+        run: "dbt-coves blue-green"
 
       - name: Run blue / green deployment with full-refresh
         if: contains(github.event.pull_request.labels.*.name, 'full-refresh')
         id: run-blue-green-full-refresh
         env:
           {% raw %}MANIFEST_FOUND: ${{ steps.prod-manifest.outputs.manifest_found }}{% endraw %}
-        run: "dbt-coves blue-green --defer --full-refresh"
+        run: "dbt-coves blue-green --full-refresh"
 
       - name: Drop orphaned relations in db that are no longer in dbt
         {% raw %}run: "dbt run-operation drop_orphaned_relations --args '{\"dry_run\": false}'"{% endraw %}
@@ -121,7 +123,7 @@ jobs:
           folder: transform/target
 
       - name: Upload dbt artifacts
-        run: "dbt run-operation upload_artifacts"
+        {% raw %}run: "dbt run-operation upload_artifacts --args \"{stage: '{% endraw %}{{ dbt_artifacts_stage }}{% raw %}'}\""{% endraw %}
 
       - uses: fregante/setup-git-user@v2
       - name: Bump dbt project and git project version

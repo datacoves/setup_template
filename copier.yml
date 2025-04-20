@@ -43,6 +43,7 @@ services:
     Set up CI/CD scripts: setup_ci_cd
     Set up governance with SQLFluff, dbt-checkpoint, and YMLLint: setup_precommit
     Create sample Airflow DAGs: setup_airflow_dags
+    Create sample dlt script and Airflow DAG: setup_dlt
     Create dbt-coves config and templates: setup_dbtcoves
 
 
@@ -83,6 +84,12 @@ dbt_time_zone:
     - America/Los_Angeles
     - Europe/London
     - Europe/Berlin
+
+dbt_artifacts_stage:
+  type: str
+  when: "{{'setup_ci_cd' in services}}"
+  default: "PRD_DBT_GENERATED.DBT_ARTIFACTS.ARTIFACTS"
+  help: Enter the name of the Snowflake stage where artifacts will be stored
 
 
 # Airflow related vars

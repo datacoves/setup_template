@@ -7,6 +7,9 @@ from airflow.utils.log.logging_mixin import LoggingMixin
 from airflow.hooks.base import BaseHook
 from airflow.exceptions import AirflowNotFoundException
 
+logger = LoggingMixin().log
+
+
 ############################################
 # Constants
 ############################################
@@ -14,31 +17,77 @@ from airflow.exceptions import AirflowNotFoundException
 # If you have more than one Airflow instance, add
 # the production instance sluf (like abc123), this
 # will be the only one where Airflow DAGs will be scheduled
-PROD_ENVIRONMENT_SLUG = ""
+PRD_ENVIRONMENT_SLUG = ""
 
 
 ############################################
 # Environment Variables
 ############################################
 
-def connection_to_env_vars(connection_id):
+def set_dlt_env_vars(dlt_connections):
+    all_vars = {}
+    vars = {}
+
+    if 'sources' in dlt_connections.keys():
+        sources = dlt_connections['sources']
+
+        for src in sources:
+            prefix = "SOURCE__SNOWFLAKE__CREDENTIALS__"
+            vars.update(connection_to_env_vars(src, prefix, True))
+
+    if 'destinations' in dlt_connections.keys():
+        destinations = dlt_connections['destinations']
+
+        for dest in destinations:
+            prefix = "DESTINATION__SNOWFLAKE__CREDENTIALS__"
+            vars.update(connection_to_env_vars(dest, prefix, True))
+
+    all_vars = {**vars, **uv_env_vars()}
+
+    return all_vars
+
+
+def format_private_key(key):
+    key_to_lines = key.split('\n')
+
+    # Exclude the first and last lines since these have --START and END
+    middle_lines = key_to_lines[1:-2]
+
+    # Join the remaining lines into a single line
+    return ''.join(middle_lines)
+
+
+def connection_to_env_vars(connection_id, prefix = None, is_for_dlt = False):
     vars = {}
 
     try:
         # Get the connection object
         conn = BaseHook.get_connection(connection_id)
 
-        prefix = f"DATACOVES__{connection_id.upper()}__"
+        if not prefix:
+            prefix = f"DATACOVES__{connection_id.upper()}__"
 
         # Access specific connection parameters
-        vars[f"{prefix}ACCOUNT"] = conn.extra_dejson.get('account')
+        if is_for_dlt:
+            vars[f"{prefix}HOST"] = conn.extra_dejson.get('account')
+            vars[f"{prefix}USERNAME"] = conn.login
+        else:
+            vars[f"{prefix}ACCOUNT"] = conn.extra_dejson.get('account')
+            vars[f"{prefix}USER"] = conn.login
+
+        if conn.extra_dejson.get('private_key_content'):
+            vars[f"{prefix}PRIVATE_KEY"] = format_private_key(conn.extra_dejson.get('private_key_content'))
+        elif conn.password:
+            vars[f"{prefix}PASSWORD"] = conn.password
+        else:
+            logger.error("Neither Password nor Private Key Found")
+
         vars[f"{prefix}DATABASE"] = conn.extra_dejson.get('database')
         vars[f"{prefix}WAREHOUSE"] = conn.extra_dejson.get('warehouse')
         vars[f"{prefix}ROLE"] = conn.extra_dejson.get('role')
-        vars[f"{prefix}USER"] = conn.login
-        vars[f"{prefix}PASSWORD"] = conn.password
 
     except AirflowNotFoundException:
+        logger.error(f"Connection not found: {connection_id}")
         pass
 
     return vars
@@ -84,19 +133,25 @@ def get_last_dag_successful_run_date(dag_id):
 # Sets Schedule to None in My Airflow and in Development Environment based on Datacoves Environment Slug defined above
 def set_schedule(default_input: Union[str, None]) -> Union[str, None]:
     """
-    Sets the DAGs schedule based on the current environment setting. Allows you to
-    set the desired DAG schedule for prod Airflow instances and None for all other environments.
+    Sets the application's schedule based on the current environment setting. Allows you to
+    set the the default for dev to none and the the default for prod to the default input.
+
+    This function checks the Datacoves Slug through 'DATACOVES__ENVIRONMENT_SLUG' variable to determine
+    if the application is running in a specific environment (e.g., 'dev123'). If the application
+    is running in the 'dev123' environment, it indicates that no schedule should be used, and
+    hence returns None. For all other environments, the function returns the given 'default_input'
+    as the schedule.
 
    Parameters:
-    - default_input: The default schedule to return if the application is running in a production
-      Airflow environment.
+    - default_input (Union[str, None]): The default schedule to return if the application is not
+      running in the dev environment.
 
     Returns:
-    - The default schedule if the environment is production; otherwise, None,
-      indicating that no schedule should be used in the non-production environment.
+    - Union[str, None]: The default schedule if the environment is not 'dev123'; otherwise, None,
+      indicating that no schedule should be used in the dev environment.
     """
     env_slug = os.environ.get("DATACOVES__ENVIRONMENT_SLUG", "").lower()
-    if (env_slug != PROD_ENVIRONMENT_SLUG) or (not is_team_airflow()):
+    if (env_slug != PRD_ENVIRONMENT_SLUG) or (not is_team_airflow()):
         return None
     else:
         return default_input

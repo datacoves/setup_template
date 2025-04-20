@@ -1,6 +1,6 @@
 {# This macro receives a list of closed pr ids joined by pipes, and removes any databases that still exist. #}
 {#
-    To run: 
+    To run:
     dbt run-operation remove_closed_pr_dbs --args '{pr_ids: 1|2|3|4|5}'
 #}
 
@@ -11,7 +11,7 @@
 
       {% for this_pr in pr_array %}
         {% set this_db = 'BALBOA_PR_' ~ this_pr %}
-        
+
         {{ log("Running drop statement for database: " ~ this_db, info=true) }}
         {% set drop_db_sql %}
             DROP DATABASE IF EXISTS {{ this_db }};

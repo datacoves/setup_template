@@ -1,11 +1,14 @@
 {# This macro grants access to a test database #}
 {#
-    To run: 
+    To run:
     dbt run-operation grant_access_to_pr_database
 #}
 
 {%- macro grant_access_to_pr_database() -%}
-    {% set db_role_name = 'z_db_balboa_tst' %}
+    {% set db_base_name = var("base_database_name") %}
+
+    {% set db_role_name = 'z_db__tst_' + db_base_name + "__r" %}
+    {{print(db_role_name)}}
     {% set db_name = target.database %}
 
     {% set apply_db_grants_sql %}
@@ -15,7 +18,7 @@
     {% do run_query(apply_db_grants_sql) %}
 
     {% set schemas_list %}
-        select schema_name       
+        select schema_name
         from {{ db_name }}.information_schema.schemata
         where schema_name not in ('INFORMATION_SCHEMA','PUBLIC','DBT_TEST__AUDIT')
     {% endset %}
@@ -24,9 +27,9 @@
     {% for schema in schemas %}
 
         {% set apply_schema_grants_sql %}
-            grant usage on schema {{db_name}}.{{ schema[0] }} to z_schema_{{schema[0]}};
-            grant select on all tables in schema {{db_name}}.{{ schema[0] }} to role z_tables_views_general;
-            grant select on all views in schema {{db_name}}.{{ schema[0] }} to role z_tables_views_general;
+            grant usage on schema {{db_name}}.{{ schema[0] }} to z_schema__{{schema[0]}};
+            grant select on all tables in schema {{db_name}}.{{ schema[0] }} to role z_tables_views__r;
+            grant select on all views in schema {{db_name}}.{{ schema[0] }} to role z_tables_views__r;
         {% endset %}
 
         {% do run_query(apply_schema_grants_sql) %}

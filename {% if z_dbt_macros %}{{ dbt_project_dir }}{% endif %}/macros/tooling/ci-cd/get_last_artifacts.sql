@@ -1,6 +1,6 @@
 {# Macro for returning dbt manifest from a snowflake stage. #}
 {#
-    dbt run-operation get_last_artifacts
+    dbt run-operation get_last_artifacts --args "{stage: PRD_DBT_GENERATED.DBT_ARTIFACTS.ARTIFACTS}"
 #}
 {# Once this is completed, deferral and state modifiers are available using --state logs #}
 
@@ -15,16 +15,40 @@
 
     {{ print("\nCurrent items in stage " ~ stage) }}
     {% set results = run_query(list_stage_query) %}
-    {{ results.exclude('md5').print_table(max_column_width=40) }}
-    {{ print("\n" ~ "="*85) }}
 
-    {% set artifacts_destination =  "file://" + logs_dir %}
+    {# Check if any rows were returned #}
+    {% if results.rows %}
+        {{ results.exclude('md5').print_table(max_column_width=40) }}
+        {{ print("\n" ~ "="*85) }}
 
-    {% set get_query %}
-        get @{{ stage }}/manifest.json {{ artifacts_destination }};
-        get @{{ stage }}/catalog.json {{ artifacts_destination }};
-    {% endset %}
+        {% set file_names = results.columns['name'].values()|map('lower')|list %}
 
-    {% set results = run_query(get_query) %}
+        {% set artifacts_destination =  "file://" + logs_dir %}
+
+        {% if 'artifacts/manifest.json' not in file_names %}
+            {{ print("manifest.json not found in the stage") }}
+        {% else %}
+            {% set get_query %}
+                get @{{ stage }}/manifest.json {{ artifacts_destination }};
+            {% endset %}
+
+            {% set results = run_query(get_query) %}
+            {{ print("Downloaded manifest.json to " + logs_dir) }}
+        {% endif %}
+
+
+        {% if 'artifacts/catalog.json' not in file_names %}
+            {{ print("catalog.json not found in the stage") }}
+        {% else %}
+            {% set get_query %}
+                get @{{ stage }}/catalog.json {{ artifacts_destination }};
+            {% endset %}
+
+            {% set results = run_query(get_query) %}
+            {{ print("Downloaded catalog.json to " + logs_dir) }}
+        {% endif %}
+    {% else %}
+        {{ print("manifest.json nor catalog.json files found in the stage.") }}
+    {% endif %}
 
 {% endmacro %}

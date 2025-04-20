@@ -7,7 +7,7 @@ cd $DATACOVES__DBT_HOME
 
 # Grepping and bumping version string
 version_line=$(grep ^version < dbt_project.yml)
-version=$(echo "${version_line}" | cut -d"'" -f2)
+version=$(echo "${version_line}" | tr -d '"'\'' ' | cut -d':' -f2)
 bumped_version=$(echo "${version}" | awk -F. '{print $1+1"."$2"."$3}')
 
 # This is used to replace version inside project.yml
