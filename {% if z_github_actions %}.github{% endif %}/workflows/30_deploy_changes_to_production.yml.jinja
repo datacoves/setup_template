@@ -29,7 +29,7 @@ jobs:
     # https://github.com/<org>/<repo>/settings/environments
     # environment: PR_ENV
 
-    {% if 'snowflake' in dbt_adapter %}
+    {% if 'snowflake' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
     {%- elif 'redshift' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
@@ -48,7 +48,7 @@ jobs:
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
 
       {% if 'snowflake' in dbt_adapter %}
-      {% raw %}
+      {%- raw -%}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
       DATACOVES__MAIN__DATABASE: PRD_${{ vars.DATACOVES__MAIN__DATABASE }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
@@ -134,7 +134,7 @@ jobs:
         uses: ad-m/github-push-action@v0.6.0
         with:
           tags: true
-          {% raw %}
+          {% raw -%}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref_name }}
           {% endraw %}

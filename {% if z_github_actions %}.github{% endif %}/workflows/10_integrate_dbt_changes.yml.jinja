@@ -44,7 +44,7 @@ jobs:
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
 
       {% if 'snowflake' in dbt_adapter %}
-      {% raw %}
+      {%- raw -%}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
       DATACOVES__MAIN__DATABASE: TST_${{ vars.DATACOVES__MAIN__DATABASE }}_PR_${{ github.event.number }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
@@ -129,12 +129,12 @@ jobs:
 
       # Clone incremental models that are in the build sequence and have not changed
       # This will prevent a full build
-      - nome: Clone Incremental models
+      - name: Clone Incremental models
         {% raw %}if: ${{ steps.prod_manifest.outputs.manifest_found == 'true' && contains(github.event.pull_request.labels.*.name, 'full-refresh') != true }}{% endraw %}
         run: "dbt clone --state logs -s state:modified+,config.materialized:incremental,state:old"
 
       # Clone snapshot models that are in the build sequence and have not changed
-      - nome: Clone Snapshots
+      - name: Clone Snapshots
         {% raw %}if: ${{ steps.prod_manifest.outputs.manifest_found == 'true' && contains(github.event.pull_request.labels.*.name, 'full-refresh') != true }}{% endraw %}
         run: " dbt clone --state logs -s state:modified+,config.materialized:snapshot,state:old"
 
@@ -153,7 +153,7 @@ jobs:
       # We drop the database when there is a failure to grant access to the db because
       # most likely the schema was not set properly in dbt_project.yml so models built to default schema
       - name: Drop PR database on Failure to grant security access
-        {% raw %}
+        {%- raw %}
         if: ${{ failure() && steps.grant-access-to-database.conclusion == 'failure' }}
         run: "dbt --no-write-json run-operation drop_recreate_db --args '{db_name: ${{env.DATACOVES__MAIN__DATABASE}}, recreate: False}'"  # yamllint disable-line rule:line-length
         {% endraw %}
