@@ -26,7 +26,7 @@ jobs:
     container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
     {%- elif 'bigquery' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
-    {%- endif -%}
+    {% endif %}
 
     # Set environment variables in
     # https://github.com//<your org>/<your repo>/settings/variables/actions

@@ -30,7 +30,7 @@ jobs:
     container: datacoves/ci-basic-dbt-databricks:{{datacoves_env_version}}
     {%- elif 'bigquery' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-bigquery:{{datacoves_env_version}}
-    {%- endif -%}
+    {% endif %}
 
     defaults:
       run:
@@ -71,7 +71,7 @@ jobs:
       DATACOVES__MAIN__KEYFILE_JSON: ${{ vars.DB_KEYFILE_JSON }}
       DATACOVES__MAIN__PROJECT: ${{ vars.DB_PROJECT }}
       {%- endraw -%}
-      {%- endif -%}
+      {% endif %}
 
     steps:
       - name: Checkout branch

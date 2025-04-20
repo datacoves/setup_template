@@ -29,7 +29,7 @@ jobs:
     container: datacoves/ci-airflow-dbt-databricks:{{datacoves_env_version}}
     {%- elif 'bigquery' in dbt_adapter -%}
     container: datacoves/ci-airflow-dbt-bigquery:{{datacoves_env_version}}
-    {%- endif -%}
+    {% endif %}
 
     env:
       {% raw %}AIRFLOW__CORE__DAGS_FOLDER: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{%endraw%}/{{ dags_path }}
