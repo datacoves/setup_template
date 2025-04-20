@@ -18,7 +18,7 @@ jobs:
   dbt:
     name: Pull Request dbt Tests
     runs-on: ubuntu-latest
-    {%- if 'snowflake' in dbt_adapter -%}
+    {% if 'snowflake' in dbt_adapter %}
     container: datacoves/ci-basic-dbt-snowflake:{{datacoves_env_version}}
     {%- elif 'redshift' in dbt_adapter -%}
     container: datacoves/ci-basic-dbt-redshift:{{datacoves_env_version}}
@@ -35,7 +35,6 @@ jobs:
     # https://github.com/<org>/<repo>/settings/environments
     # environment: PR_ENV
 
-
     defaults:
       run:
         {% raw %}working-directory: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/{% endraw %}{{ dbt_project_dir }}
@@ -45,7 +44,7 @@ jobs:
       {% raw %}DATACOVES__DBT_HOME: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}{% endraw %}/{{ dbt_project_dir }}
 
       {%- if 'snowflake' in dbt_adapter -%}
-      {%- raw -%}
+      {% raw %}
       DATACOVES__MAIN__ACCOUNT: ${{ vars.DATACOVES__MAIN__ACCOUNT }}
       DATACOVES__MAIN__DATABASE: TST_${{ vars.DATACOVES__MAIN__DATABASE }}_PR_${{ github.event.number }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DATACOVES__MAIN__SCHEMA }}
@@ -55,7 +54,7 @@ jobs:
       DATACOVES__MAIN__PRIVATE_KEY: ${{ secrets.DATACOVES__MAIN__PRIVATE_KEY }}
       {%- endraw -%}
       {% elif 'redshift' in dbt_adapter %}
-      {%- raw -%}
+      {% raw %}
       DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
       DATACOVES__MAIN__USER: ${{ vars.DB_USER }}
       DATACOVES__MAIN__PASSWORD: ${{ vars.DB_PASSWORD }}
@@ -64,14 +63,14 @@ jobs:
       DATACOVES__MAIN__PORT: ${{ vars.DB_PORT }}
       {%- endraw -%}
       {% elif 'databricks' in dbt_adapter %}
-      {%- raw -%}
+      {% raw %}
       DATACOVES__MAIN__HOST: ${{ vars.DB_HOST }}
       DATACOVES__MAIN__HTTP_PATH: ${{ vars.DB_HTTP_PATH }}
       DATACOVES__MAIN__SCHEMA: ${{ vars.DB_SCHEMA }}
       DATACOVES__MAIN__TOKEN: ${{ vars.DB_TOKEN }}
       {%- endraw -%}
       {% elif 'bigquery' in dbt_adapter %}
-      {%- raw -%}
+      {% raw %}
       DATACOVES__MAIN__KEYFILE_JSON: ${{ vars.DB_KEYFILE_JSON }}
       DATACOVES__MAIN__PROJECT: ${{ vars.DB_PROJECT }}
       {%- endraw -%}
@@ -154,7 +153,7 @@ jobs:
       # We drop the database when there is a failure to grant access to the db because
       # most likely the schema was not set properly in dbt_project.yml so models built to default schema
       - name: Drop PR database on Failure to grant security access
-        {%- raw -%}
+        {% raw %}
         if: always() && (env.DATACOVES__DROP_DB_ON_FAIL == 'true') && (steps.grant-access-to-database.outcome == 'failure')
         run: "dbt --no-write-json run-operation drop_recreate_db --args '{db_name: ${{env.DATACOVES__MAIN__DATABASE}}, recreate: False}'"  # yamllint disable-line rule:line-length
         {%- endraw -%}
