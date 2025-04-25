@@ -45,7 +45,7 @@ seeds:
       columns: true
 
   # Snowflake Defaults
-  +transient: "{{ 'false' if target.name == 'prd' else 'true' }}"
+  +transient: {% raw %}"{{ 'false' if target.name == 'prd' else 'true' }}" {% endraw %}
   copy_grants: true
 
 snapshots:
