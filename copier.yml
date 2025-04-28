@@ -52,8 +52,7 @@ services:
 dbt_project_dir:
   type: str
   when: "{{'setup_dbt_project' in services or 'setup_ci_cd' in services or 'add_dbt_helper_macros' in services }}"
-  # default: "{{ datacoves_env.get('DATACOVES__DBT_HOME_REL_PATH', '.') }}"
-  default: "{% env.DATACOVES__DBT_HOME_REL_PATH, '.' %}"
+  default: "{% env 'DATACOVES__DBT_HOME_REL_PATH', '.' %}"
   help: Enter the dbt project directory
 
 dbt_project_name:
@@ -97,36 +96,31 @@ dbt_artifacts_stage:
 dags_path:
   type: str
   when: "{{'setup_airflow_dags' in services or 'setup_ci_cd' in services}}"
-  # default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags') }}"
-  default: "{% env.DATACOVES__AIRFLOW_DAGS_PATH, 'orchestrate/dags' %}"
+  default: "{% env 'DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags' %}"
   help: Airflow DAGs path
 
 airflow_artifacts_path:
   type: str
   when: "{{'setup_ci_cd' in services}}"
-  # default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags').split('/')[0] }}"
-  default: "{% env.DATACOVES__AIRFLOW_DAGS_PATH, 'orchestrate/dags' %}.split('/')[0] }}"
+  default: "{{ {% env 'DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags' %}.split('/')[0] }}"
   help: Airflow Artifacts path for unit tests
 
 airflow_utils_path:
   type: str
   when: "{{'setup_airflow_dags' in services or 'setup_ci_cd' in services}}"
-  # default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags').split('/')[0] }}/utils"
-  default: "{{ {% env.DATACOVES__AIRFLOW_DAGS_PATH, 'orchestrate/dags' %}.split('/')[0] }}/utils"
+  default: "{{ {% env 'DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags' %}.split('/')[0] }}/utils"
   help: Airflow utils path
 
 airflow_tests_path:
   type: str
   when: "{{ add_airflow_tests }}"
-  # default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags').split('/')[0] }}/test_dags"
-  default: "{{ {% env.DATACOVES__AIRFLOW_DAGS_PATH, 'orchestrate/dags' %}.split('/')[0] }}/test_dags"
+  default: "{{ {% env 'DATACOVES__AIRFLOW_DAGS_PATH', 'orchestrate/dags' %}.split('/')[0] }}/test_dags"
   help: Airflow tests path
 
 yml_dags_path:
   type: str
   when: "{{'setup_airflow_dags' in services and yml_dags_confirm_path}}"
-  # default: "{{datacoves_env.get('DATACOVES__AIRFLOW_DAGS_YML_PATH', 'orchestrate/dags_yml_definitions')}}"
-  default: "{% env.DATACOVES__AIRFLOW_DAGS_YML_PATH, 'orchestrate/dags_yml_definitions' %}"
+  default: "{% env 'DATACOVES__AIRFLOW_DAGS_YML_PATH', 'orchestrate/dags_yml_definitions' %}"
   help: Airflow YML Dags path
 
 # dbt-coves generate related vars
@@ -185,22 +179,19 @@ use_yamllint:
 dbt_checkpoint_version:
   type: str
   help: What dbt-checkpoint version are you using?
-  # default: "{{ datacoves_env.get('DATACOVES__DBT_CHECKPOINT_VERSION', 'v2.0.6') }}"
-  default: "{% env.DATACOVES__DBT_CHECKPOINT_VERSION, 'v2.0.6' %}"
+  default: "{% env 'DATACOVES__DBT_CHECKPOINT_VERSION', 'v2.0.6' %}"
   when: "{{use_dbt_checkpoint}}"
 
 yamllint_version:
   type: str
   help: What yamllint version are you using?
-  # default: "{{ datacoves_env.get('DATACOVES__YAMLLINT_VERSION', 'v1.36.2') }}"
-  default: "{% env.DATACOVES__YAMLLINT_VERSION, 'v1.36.2' %}"
+  default: "{% env 'DATACOVES__YAMLLINT_VERSION', 'v1.36.2' %}"
   when: "{{use_yamllint}}"
 
 sqlfluff_version:
   type: str
   help: What sqlfluff version are you using?
-  # default: "{{ datacoves_env.get('DATACOVES__SQLFLUFF_VERSION', '3.1.1') }}"
-  default: "{% env.DATACOVES__SQLFLUFF_VERSION, '3.1.1' %}"
+  default: "{% env 'DATACOVES__SQLFLUFF_VERSION', '3.1.1' %}"
   when: "{{use_sqlfluff}}"
 
 # dbt related vars
@@ -213,8 +204,7 @@ dbt_adapter:
     - databricks
   help: Which dbt adapter are you using?
   when: "{{not datacoves_dbt_adapter and ('setup_dbt_profile' in services or setup_ci_cd or setup_sqlfluff)}}"
-  # default: "{{ datacoves_env.get('DATACOVES__DBT_ADAPTER', 'snowflake') }}"
-  default: "{% env.DATACOVES__DBT_ADAPTER, 'snowflake' %}"
+  default: "{% env 'DATACOVES__DBT_ADAPTER', 'snowflake' %}"
 
 add_dbt_helper_macros:
   type: bool
@@ -237,15 +227,13 @@ base_database_name:
 dbt_profiles_path:
   type: str
   when: "{{ 'setup_dbt_profile' in services or 'setup_ci_cd' in services }}"
-  # default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DBT_PROFILE_PATH', 'automate/dbt') }}"
-  default: "{% env.DATACOVES__AIRFLOW_DBT_PROFILE_PATH, 'automate/dbt' %}"
+  default: "{% env 'DATACOVES__AIRFLOW_DBT_PROFILE_PATH', 'automate/dbt' %}"
   help: dbt Profile Path for automated runs
 
 automated_scripts_path:
   type: str
   when: "{{ 'setup_ci_cd' in services }}"
-  # default: "{{ datacoves_env.get('DATACOVES__AIRFLOW_DBT_PROFILE_PATH', 'automate/').split('/')[0] }}"
-  default: "{{ {% env.DATACOVES__AIRFLOW_DBT_PROFILE_PATH, 'automate/' %}.split('/')[0] }}"
+  default: "{{ {% env 'DATACOVES__AIRFLOW_DBT_PROFILE_PATH', 'automate/' %}.split('/')[0] }}"
   help: Path for automated scripts
 
 # Variables to simplify folder names
