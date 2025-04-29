@@ -59,6 +59,10 @@ dbt_project_name:
   type: str
   when: "{{'setup_dbt_project' in services or 'add_dbt_helper_macros' in services }}"
   help: Enter a name for your dbt project?
+  validator: >-
+    {% if not (dbt_project_name | regex_search('^[A-Za-z0-9_]+$')) %}
+    The project name must contain only letters, numbers, and underscores.
+    {% endif %}
 
 store_dbt_tests:
   type: bool
